@@ -1,6 +1,20 @@
 /* 覆盖mint-ui的primary颜色，改为自己UI的主题色 */
 $color-primary: #EA5B2D;
- 
+ html,body{
+   margin: 0
+ }
+ .mint-cell-wrapper{
+  border-bottom: 1px solid #F6F6F6
+}
+.readonly .mint-field-other{
+  width: 100%
+}
+.mint-field-core{
+  text-align: right
+}
+.mint-field .mint-cell-title {
+  width: 150px;
+}
 .mint-header {
   background-color: $color-primary;
 }
