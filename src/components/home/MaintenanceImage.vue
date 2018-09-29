@@ -1,9 +1,8 @@
 <template>
   <div class="page-cell">
-    <mt-cell title="上传需要查询车辆的行驶证">
-    </mt-cell>
+    <p class="title">上传需要查询资料的行驶证</p>
     <div class="imgbox">
-      <img src="../../assets/add.png">
+      <img src="../../assets/upload.png" class="upload">
       <input type="file" name="file" v-on:change="addimg($event)" class="fileimg">
     </div>
   </div>
@@ -53,51 +52,32 @@
     display: inline-block;
     margin: 0 10px;
   }
-
-  .choose {
-    position: absolute;
-    top: 0;
-    right: 50px;
-  }
-
-  .choose-btn {
-    color: #656b79;
-    background-color: #ffffff;
-    -webkit-box-shadow: 0 0 1px #ffffff;
-    box-shadow: 0 0 1px #ffffff;
-  }
-
-  .area-class {
-    width: 100%;
-  }
-
-  .imgbox {
-    position: relative;
-  }
-
-  .imgbox img {
-    width: 100px;
-    height: 100px;
+.imgbox img {
+    width: 96%;
+    margin-left: 2%;
+    height: 10rem;
   }
 
   .fileimg {
     position: absolute;
-    width: 100px;
-    height: 100px;
+    width: 96%;
+    height: 10rem;
     top: 0;
-    left: 0;
+    left: 2%;
     opacity: 0;
   }
 
   .foot-btn {
     position: fixed;
-    bottom: 1rem;
+    bottom: 0rem;
     width: 100%
   }
 
   .foot-btn button {
-    width: 46%;
-    margin-left: 2%;
+    width: 100%
   }
-
+  .title{
+    margin-left: 2%;
+    color: #808080
+  }
 </style>

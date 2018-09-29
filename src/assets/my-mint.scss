@@ -1,7 +1,10 @@
 /* 覆盖mint-ui的primary颜色，改为自己UI的主题色 */
-$color-primary: #EA5B2D;
+$color-primary: #0B2C8C;
  html,body{
-   margin: 0
+   margin: 0;
+   width: 100%;
+   height: 100%;
+   background-color: #F5F5F7
  }
  .mint-cell-wrapper{
   border-bottom: 1px solid #F6F6F6

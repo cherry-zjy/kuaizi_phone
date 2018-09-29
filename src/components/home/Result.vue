@@ -1,37 +1,64 @@
 <template>
   <div class="page-cell">
-    <mt-cell title="上传需要查询车辆的行驶证">
-    </mt-cell>
-    <div class="imgbox">
-      <img src="../../assets/add.png">
-      <input type="file" name="file" v-on:change="addimg($event)" class="fileimg">
-    </div>
+    <mt-cell title="排放标准" :value="list.model_emission_standard"></mt-cell>
+    <mt-cell title="车型ID" :value="list.model_id"></mt-cell>
+    <mt-cell title="车辆品牌名" :value="list.brand_name"></mt-cell>
+    <mt-cell title="车系名称" :value="list.series_name"></mt-cell>
+    <mt-cell title="车型年款" :value="list.model_year"></mt-cell>
+    <mt-cell title="品牌ID" :value="list.brand_id"></mt-cell>
+    <mt-cell title="变速箱类型" :value="list.model_gear"></mt-cell>
+    <mt-cell title="排量"  :value="list.model_liter"></mt-cell>
+    <!-- <mt-cell title="车型名称" :value="list.brand_name"></mt-cell> -->
+    <mt-cell title="车系ID" :value="list.series_id"></mt-cell>
+    <mt-cell title="车型指导价" :value="list.model_price"></mt-cell>
+    <mt-cell title="最小上牌年份" :value="list.min_reg_year"></mt-cell>
+    <mt-cell title="最大上牌年份" :value="list.max_reg_year"></mt-cell>
+    <!-- <mt-cell title="映射车型ID" :value="list.brand_name"></mt-cell> -->
   </div>
 </template>
 
 <script>
+import { Toast } from 'mint-ui';
+import { Indicator } from 'mint-ui';
   export default {
     data: function () {
       return {
-        list: {
-          
-        },
+        list: {}
       };
     },
-    mounted() {},
+    mounted() {
+      this.getInfo()
+    },
     methods: {
-      addimg(e) { //添加图片
-        var files = e.target.files || e.dataTransfer.files;
-        if (!files.length) {
-          return;
-        } else {
-          var formData = new FormData();
-          formData.append('file', files[0]);
-        }
+      getInfo() {
+        Indicator.open();
+        this.$http
+          .get("api/Back/Carvin", {
+            params: {
+              vin: '1G6A95RX3E0128766',
+              // Token: getCookie("token"),
+            }
+          })
+          .then(
+            function (response) {
+              Indicator.close();
+              var status = response.data.Status;
+              if (status === 1) {
+                this.list = response.data.Result
+              } else {
+                Indicator.close();
+                Toast(response.data.Result)
+              }
+            }.bind(this)
+          )
+          // 请求error
+          .catch(
+            function (error) {
+              Indicator.close();
+              Toast('服务器开小差啦，请稍后再试')
+            }.bind(this)
+          );
       },
-      // query(){
-      //   this.$router.push("/CarQuery");
-      // },
     }
   }
 

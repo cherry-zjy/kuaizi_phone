@@ -1,17 +1,18 @@
 <template>
   <div class="page-cell">
-    <mt-cell title="上传需要查询车辆的行驶证">
-    </mt-cell>
+    <p class="title">上传需要查询资料的行驶证</p>
     <div class="imgbox">
-      <img src="../../assets/add.png">
+      <img src="../../assets/upload.png" class="upload">
       <input type="file" name="file" v-on:change="addimg($event)" class="fileimg">
     </div>
+    <p class="title">输入查询车辆相关信息</p>
     <mt-field disableClear label="发动机号" placeholder="请输入发动机号" v-model="list.engine_no"></mt-field>
     <mt-field disableClear label="身份证号" type="mile" placeholder="身份证号" v-model="list.id_no"></mt-field>
-    <!-- <div class="foot-btn">
-      <mt-button type="primary" size="small" @click="query()">单次查询</mt-button>
-      <mt-button type="primary" size="small" @click="query()">月卡查询</mt-button>
-    </div> -->
+    <div class="foot-btn">
+      <mt-button type="primary" @click="query()">确认</mt-button>
+      <!-- <mt-button type="primary" size="small" @click="query()">单次查询</mt-button> -->
+      <!-- <mt-button type="primary" size="small" @click="query()">月卡查询</mt-button> -->
+    </div>
   </div>
 </template>
 
@@ -83,28 +84,32 @@
   }
 
   .imgbox img {
-    width: 100px;
-    height: 100px;
+    width: 96%;
+    margin-left: 2%;
+    height: 10rem;
   }
 
   .fileimg {
     position: absolute;
-    width: 100px;
-    height: 100px;
+    width: 96%;
+    height: 10rem;
     top: 0;
-    left: 0;
+    left: 2%;
     opacity: 0;
   }
 
   .foot-btn {
     position: fixed;
-    bottom: 1rem;
+    bottom: 0rem;
     width: 100%
   }
 
   .foot-btn button {
-    width: 46%;
+    width: 100%
+  }
+  .title{
     margin-left: 2%;
+    color: #808080
   }
 
 </style>

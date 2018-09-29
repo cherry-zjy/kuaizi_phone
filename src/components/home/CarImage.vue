@@ -1,28 +1,30 @@
 <template>
   <div class="page-cell">
-    <mt-cell title="上传需要查询车辆的行驶证">
-    </mt-cell>
+    <p class="title">上传需要查询资料的行驶证</p>
     <div class="imgbox">
-      <img src="../../assets/add.png">
+      <img src="../../assets/upload.png" class="upload">
       <input type="file" name="file" v-on:change="addimg($event)" class="fileimg">
     </div>
-    <mt-field disableClear label="车型ID" placeholder="请输入车型ID" v-model="list.modelid"></mt-field>
+    <p class="title">输入查询车辆相关信息</p>
+    <mt-field disableClear label="车型ID" readonly placeholder="请输入车型ID" v-model="list.modelid"></mt-field>
     <mt-cell title="省市" :value="list.zone" is-link @click.native="handlerArea"></mt-cell>
     <mt-cell title="上牌日期" :value="list.regDate" is-link @click.native="open('picker2')"></mt-cell>
     <mt-popup v-model="areaVisible" class="area-class" position="bottom">
       <mt-picker :slots="addressSlots" class="picker" @change="onAddressChange" :visible-item-count="5"></mt-picker>
     </mt-popup>
-    <mt-field disableClear label="行驶里程（万公里）" type="mile" placeholder="行驶里程" v-model="list.Dis"></mt-field>
+    <mt-field disableClear label="行驶里程（万公里）" type="number" placeholder="行驶里程" v-model="list.mile"></mt-field>
     <mt-datetime-picker ref="picker2" type="date" v-model="value2" @confirm="handleChange" :endDate="endDate">
     </mt-datetime-picker>
-    <!-- <div class="foot-btn">
-      <mt-button type="primary" size="small" @click="query()">单次查询</mt-button>
-      <mt-button type="primary" size="small" @click="query()">月卡查询</mt-button>
-    </div> -->
+    <div class="foot-btn">
+      <!-- <mt-button type="primary" size="small" @click="query()">单次查询</mt-button> -->
+      <mt-button type="primary" @click="query()">确认</mt-button>
+    </div>
   </div>
 </template>
 
 <script>
+import { Toast } from 'mint-ui';
+import { Indicator } from 'mint-ui';
   const address = {
     '北京': ['北京'],
     '广东': ['广州', '深圳', '珠海', '汕头', '韶关', '佛山', '江门', '湛江', '茂名', '肇庆', '惠州', '梅州', '汕尾', '河源', '阳江', '清远', '东莞', '中山',
@@ -83,6 +85,7 @@
           regDate: '',
           mile: ''
         },
+        city:'',
         areaVisible: false,
         areaVisible1: true,
         addressSlots: [{
@@ -103,8 +106,39 @@
         value2: null,
       };
     },
-    mounted() {},
+    mounted() {
+      // this.getInfo()
+    },
     methods: {
+      getInfo() {
+        Indicator.open();
+        this.$http
+          .get("api/Back/Carvin", {
+            params: {
+              vin: '1G6A95RX3E0128766',
+              // Token: getCookie("token"),
+            }
+          })
+          .then(
+            function (response) {
+              Indicator.close();
+              var status = response.data.Status;
+              if (status === 1) {
+                this.list.modelid = response.data.Result.model_id
+              } else {
+                Indicator.close();
+                Toast(response.data.Result)
+              }
+            }.bind(this)
+          )
+          // 请求error
+          .catch(
+            function (error) {
+              Indicator.close();
+              Toast('服务器开小差啦，请稍后再试')
+            }.bind(this)
+          );
+      },
       addimg(e) { //添加图片
         var files = e.target.files || e.dataTransfer.files;
         if (!files.length) {
@@ -112,7 +146,6 @@
         } else {
           var formData = new FormData();
           formData.append('file', files[0]);
-
         }
       },
       open(picker) {
@@ -127,6 +160,8 @@
       onAddressChange(picker, values) {
         picker.setSlotValues(1, address[values[0]]);
         this.list.zone = values[0] + values[1];
+        this.city = values[1];
+        console.log(this.city)
       },
       handleChange(value) {
         console.log(value)
@@ -143,9 +178,38 @@
       handleChange(value) {
         this.list.regDate = this.formatDate(value)
       },
-      // query(){
-      //   this.$router.push("/CarQuery");
-      // },
+      query(){
+        Indicator.open();
+        this.$http
+          .get("api/Back/GetCarPrice", {
+            params: {
+              modelid: this.list.modelid,
+              regDate:this.list.regDate,
+              zone:this.city,
+              mile:this.list.mile
+              // Token: getCookie("token"),
+            }
+          })
+          .then(
+            function (response) {
+              Indicator.close();
+              var status = response.data.Status;
+              if (status === 1) {
+                // this.list = response.data.Result
+              } else {
+                Indicator.close();
+                Toast(response.data.Result)
+              }
+            }.bind(this)
+          )
+          // 请求error
+          .catch(
+            function (error) {
+              Indicator.close();
+              Toast('服务器开小差啦，请稍后再试')
+            }.bind(this)
+          );
+      },
     }
   }
 
@@ -190,28 +254,32 @@
   }
 
   .imgbox img {
-    width: 100px;
-    height: 100px;
+    width: 96%;
+    margin-left: 2%;
+    height: 10rem;
   }
 
   .fileimg {
     position: absolute;
-    width: 100px;
-    height: 100px;
+    width: 96%;
+    height: 10rem;
     top: 0;
-    left: 0;
+    left: 2%;
     opacity: 0;
   }
 
   .foot-btn {
     position: fixed;
-    bottom: 1rem;
+    bottom: 0rem;
     width: 100%
   }
 
   .foot-btn button {
-    width: 46%;
+    width: 100%
+  }
+  .title{
     margin-left: 2%;
+    color: #808080
   }
 
 </style>
