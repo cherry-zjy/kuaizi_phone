@@ -15,8 +15,14 @@ $color-primary: #0B2C8C;
 .mint-field-core{
   text-align: right
 }
+.login .mint-field-core{
+  text-align: left
+}
 .mint-field .mint-cell-title {
   width: 150px;
+}
+.login .mint-cell-title {
+  width: 80px;
 }
 .mint-header {
   background-color: $color-primary;
