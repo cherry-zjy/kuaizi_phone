@@ -15,10 +15,10 @@
     <mt-field disableClear label="行驶里程（万公里）" type="mile" placeholder="行驶里程" v-model="list.Dis"></mt-field>
     <mt-datetime-picker ref="picker2" type="date" v-model="value2" @confirm="handleChange" :endDate="endDate">
     </mt-datetime-picker>
-    <div class="foot-btn">
+    <!-- <div class="foot-btn">
       <mt-button type="primary" size="small" @click="query()">单次查询</mt-button>
       <mt-button type="primary" size="small" @click="query()">月卡查询</mt-button>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -143,9 +143,9 @@
       handleChange(value) {
         this.list.regDate = this.formatDate(value)
       },
-      query(){
-        this.$router.push("/CarQuery");
-      },
+      // query(){
+      //   this.$router.push("/CarQuery");
+      // },
     }
   }
 

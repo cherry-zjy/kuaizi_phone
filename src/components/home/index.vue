@@ -7,13 +7,13 @@
     </mt-cell>
     <mt-cell title="保险查询">
       <span>
-        <mt-button type="primary" size="small">查询</mt-button>
+        <mt-button type="primary" size="small" @click="Insurance()">查询</mt-button>
       </span></mt-cell>
     <mt-cell title="维保查询">
       <span>
-        <mt-button type="primary" size="small">查询</mt-button>
+        <mt-button type="primary" size="small" @click="Maintenance()">查询</mt-button>
       </span></mt-cell>
-    <mt-button type="primary" class="foot-btn" @click="Record()">查询记录</mt-button>
+    <!-- <mt-button type="primary" class="foot-btn" @click="Record()">查询记录</mt-button> -->
   </div>
 </template>
 
@@ -24,12 +24,19 @@
       };
     },
     methods:{
-      Record(){
-        this.$router.push("/QueryRecord");
-      },
+      // Record(){
+      //   this.$router.push("/QueryRecord");
+      // },
       Car(){
         this.$router.push("/CarImage");
+      },
+      Insurance(){
+        this.$router.push("/InsuranceImage");
+      },
+      Maintenance(){
+        this.$router.push("/MaintenanceImage");
       }
+      
     }
   }
 
