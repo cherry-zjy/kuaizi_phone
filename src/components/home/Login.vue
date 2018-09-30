@@ -38,10 +38,14 @@
         Indicator.open();
         this.$http
           .post(
-            "api/Admin/Login",
+            "api/User/Register",
             qs.stringify({
-              Name: this.phone,
-              Password: this.password,
+              Phone: this.phone,
+              Pwd: this.password,
+              Code: -1,
+              Lng: -1,
+              Lat: -1,
+              ID: "-1"
             })
           )
           .then(
@@ -49,7 +53,7 @@
               Indicator.close();
               var status = response.data.Status;
               if (status === 1) {
-                setCookie("token", response.data.Result.WebToken);
+                setCookie("token", response.data.Result);
                 Toast({
                   message: '登录成功',
                   iconClass: 'icon icon-success'

@@ -5,15 +5,28 @@
       <img src="../../assets/upload.png" class="upload">
       <input type="file" name="file" v-on:change="addimg($event)" class="fileimg">
     </div>
+    <p class="title">输入查询车辆相关信息</p>
+    <mt-field disableClear label="发动机号" placeholder="请输入发动机号" v-model="list.engine_no"></mt-field>
+    <div class="foot-btn">
+      <mt-button type="primary" @click="query()">确认</mt-button>
+      <!-- <mt-button type="primary" size="small" @click="query()">单次查询</mt-button> -->
+      <!-- <mt-button type="primary" size="small" @click="query()">月卡查询</mt-button> -->
+    </div>
   </div>
 </template>
 
 <script>
+import {
+    Toast
+  } from 'mint-ui';
+  import {
+    Indicator
+  } from 'mint-ui';
   export default {
     data: function () {
       return {
         list: {
-          
+          engine_no:''
         },
       };
     },
@@ -28,9 +41,43 @@
           formData.append('file', files[0]);
         }
       },
-      // query(){
-      //   this.$router.push("/CarQuery");
-      // },
+      query() {
+        for (var key in this.list) {
+          if (this.list[key] == '' || this.city == '') {
+            Toast('请完善信息')
+            return;
+          }
+        }
+        Indicator.open();
+        this.$http
+          .get("api/Back/GetWB", {
+            params: {
+              engine_no: this.list.engine_no,
+              token: getCookie("token"),
+              vin: '1G6A95RX3E0128766',
+              Token: getCookie("token"),
+            }
+          })
+          .then(
+            function (response) {
+              Indicator.close();
+              var status = response.data.Status;
+              if (status === 1) {
+                window.location.href = response.data.Result.url
+              } else {
+                Indicator.close();
+                Toast(response.data.Result)
+              }
+            }.bind(this)
+          )
+          // 请求error
+          .catch(
+            function (error) {
+              Indicator.close();
+              Toast('服务器开小差啦，请稍后再试')
+            }.bind(this)
+          );
+      },
     }
   }
 

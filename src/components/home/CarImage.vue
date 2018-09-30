@@ -23,8 +23,12 @@
 </template>
 
 <script>
-import { Toast } from 'mint-ui';
-import { Indicator } from 'mint-ui';
+  import {
+    Toast
+  } from 'mint-ui';
+  import {
+    Indicator
+  } from 'mint-ui';
   const address = {
     '北京': ['北京'],
     '广东': ['广州', '深圳', '珠海', '汕头', '韶关', '佛山', '江门', '湛江', '茂名', '肇庆', '惠州', '梅州', '汕尾', '河源', '阳江', '清远', '东莞', '中山',
@@ -85,7 +89,7 @@ import { Indicator } from 'mint-ui';
           regDate: '',
           mile: ''
         },
-        city:'',
+        city: '',
         areaVisible: false,
         areaVisible1: true,
         addressSlots: [{
@@ -107,16 +111,17 @@ import { Indicator } from 'mint-ui';
       };
     },
     mounted() {
-      // this.getInfo()
+      this.getInfo()
     },
     methods: {
       getInfo() {
+        console.log(mainurl)
         Indicator.open();
         this.$http
           .get("api/Back/Carvin", {
             params: {
               vin: '1G6A95RX3E0128766',
-              // Token: getCookie("token"),
+              Token: getCookie("token"),
             }
           })
           .then(
@@ -178,15 +183,21 @@ import { Indicator } from 'mint-ui';
       handleChange(value) {
         this.list.regDate = this.formatDate(value)
       },
-      query(){
+      query() {
+        for (var key in this.list) {
+          if (this.list[key] == '' || this.city == '') {
+            Toast('请完善信息')
+            return;
+          }
+        }
         Indicator.open();
         this.$http
           .get("api/Back/GetCarPrice", {
             params: {
               modelid: this.list.modelid,
-              regDate:this.list.regDate,
-              zone:this.city,
-              mile:this.list.mile
+              regDate: this.list.regDate,
+              zone: this.city,
+              mile: this.list.mile
               // Token: getCookie("token"),
             }
           })
@@ -195,7 +206,7 @@ import { Indicator } from 'mint-ui';
               Indicator.close();
               var status = response.data.Status;
               if (status === 1) {
-                // this.list = response.data.Result
+                window.location.href = response.data.Result.url
               } else {
                 Indicator.close();
                 Toast(response.data.Result)
@@ -277,7 +288,8 @@ import { Indicator } from 'mint-ui';
   .foot-btn button {
     width: 100%
   }
-  .title{
+
+  .title {
     margin-left: 2%;
     color: #808080
   }

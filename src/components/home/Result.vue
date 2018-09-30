@@ -27,6 +27,10 @@ import { Indicator } from 'mint-ui';
       };
     },
     mounted() {
+      if (getCookie("token") == undefined || getCookie("token") == null) {
+          this.$router.push("/Login");
+          return;
+        }
       this.getInfo()
     },
     methods: {
@@ -36,7 +40,7 @@ import { Indicator } from 'mint-ui';
           .get("api/Back/Carvin", {
             params: {
               vin: '1G6A95RX3E0128766',
-              // Token: getCookie("token"),
+              Token: getCookie("token"),
             }
           })
           .then(

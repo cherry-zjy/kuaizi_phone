@@ -28,12 +28,24 @@
       //   this.$router.push("/QueryRecord");
       // },
       Car(){
+        if (getCookie("token") == undefined || getCookie("token") == null) {
+          this.$router.push("/Login");
+          return;
+        }
         this.$router.push("/CarImage");
       },
       Insurance(){
+        if (getCookie("token") == undefined || getCookie("token") == null) {
+          this.$router.push("/Login");
+          return;
+        }
         this.$router.push("/InsuranceImage");
       },
       Maintenance(){
+        if (getCookie("token") == undefined || getCookie("token") == null) {
+          this.$router.push("/Login");
+          return;
+        }
         this.$router.push("/MaintenanceImage");
       }
       
