@@ -102,7 +102,6 @@ import {
           .get("api/Back/GetWB", {
             params: {
               engine_no: this.list.engine_no,
-              token: getCookie("token"),
               vin: '1G6A95RX3E0128766',
               Token: getCookie("token"),
             }
@@ -113,6 +112,13 @@ import {
               var status = response.data.Status;
               if (status === 1) {
                 window.location.href = response.data.Result
+              }else if(status === 40001){
+                Toast(response.data.Result)
+                setTimeout(() => {
+                  this.$router.push({
+                    path: "/Login"
+                  });
+                }, 1500);
               } else {
                 Indicator.close();
                 Toast(response.data.Result)

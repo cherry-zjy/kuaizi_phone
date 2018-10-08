@@ -6,9 +6,9 @@
       <input id="image" type="file" name="file" v-on:change="addimg($event)" class="fileimg">
     </div>
     <p class="title">输入查询车辆相关信息</p>
-    <mt-field v-if="show" disableClear readonly label="发动机号" placeholder="请输入发动机号" v-model="list.engine_no"></mt-field>
+    <mt-field v-if="show" disableClear label="发动机号" placeholder="请输入发动机号" v-model="list.engine_no"></mt-field>
     <mt-field disableClear label="身份证号" type="mile" placeholder="请输入身份证号" v-model="list.id_no"></mt-field>
-    <mt-field v-if="show" disableClear readonly label="车牌号" type="mile" placeholder="请输入车牌号" v-model="list.car_no"></mt-field>
+    <mt-field v-if="show" disableClear label="车牌号" type="mile" placeholder="请输入车牌号" v-model="list.car_no"></mt-field>
     <div class="foot-btn">
       <mt-button type="primary" @click="query()">确认</mt-button>
       <!-- <mt-button type="primary" size="small" @click="query()">单次查询</mt-button> -->
@@ -120,6 +120,13 @@ import {
               var status = response.data.Status;
               if (status === 1) {
                 window.location.href = response.data.Result
+              }else if(status === 40001){
+                Toast(response.data.Result)
+                setTimeout(() => {
+                  this.$router.push({
+                    path: "/Login"
+                  });
+                }, 1500);
               } else {
                 Indicator.close();
                 Toast(response.data.Result)

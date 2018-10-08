@@ -13,42 +13,51 @@
       <span>
         <mt-button type="primary" plain size="small" @click="Maintenance()">查询</mt-button>
       </span></mt-cell>
-    <!-- <mt-button type="primary" class="foot-btn" @click="Record()">查询记录</mt-button> -->
+    <div class="foot-btn">
+      <mt-button type="primary" @click="goto('/Result')">VIN查询</mt-button>
+      <mt-button type="primary" @click="goto('/mine')">我的订单</mt-button>
+    </div>
   </div>
 </template>
 
 <script>
   export default {
     data: function () {
-      return {
-      };
+      return {};
     },
-    methods:{
+    methods: {
       // Record(){
       //   this.$router.push("/QueryRecord");
       // },
-      Car(){
+      Car() {
         if (getCookie("token") == undefined || getCookie("token") == null) {
           this.$router.push("/Login");
           return;
         }
         this.$router.push("/CarImage");
       },
-      Insurance(){
+      Insurance() {
         if (getCookie("token") == undefined || getCookie("token") == null) {
           this.$router.push("/Login");
           return;
         }
         this.$router.push("/InsuranceImage");
       },
-      Maintenance(){
+      Maintenance() {
         if (getCookie("token") == undefined || getCookie("token") == null) {
           this.$router.push("/Login");
           return;
         }
         this.$router.push("/MaintenanceImage");
+      },
+      goto(url) {
+        if (getCookie("token") == undefined || getCookie("token") == null) {
+          this.$router.push("/Login");
+          return;
+        }
+        this.$router.push(url);
       }
-      
+
     }
   }
 
@@ -70,11 +79,16 @@
     display: inline-block;
     margin: 0 10px;
   }
-  .foot-btn{
+
+  .foot-btn {
     position: fixed;
     bottom: 1rem;
     width: 96%;
     margin-left: 2%
+  }
+
+  .foot-btn button {
+    width: 49%
   }
 
 </style>

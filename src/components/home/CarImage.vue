@@ -6,7 +6,7 @@
       <input type="file" name="file" v-on:change="addimg($event)" class="fileimg">
     </div> -->
     <p class="title">输入查询车辆相关信息</p>
-    <mt-field disableClear label="车型ID" readonly placeholder="请输入车型ID" v-model="list.modelid"></mt-field>
+    <mt-field disableClear label="车型ID" placeholder="请输入车型ID" v-model="list.modelid"></mt-field>
     <mt-cell title="省市" :value="list.zone" is-link @click.native="handlerArea"></mt-cell>
     <mt-cell title="上牌日期" :value="list.regDate" is-link @click.native="open('picker2')"></mt-cell>
     <mt-popup v-model="areaVisible" class="area-class" position="bottom">
@@ -130,8 +130,14 @@
               var status = response.data.Status;
               if (status === 1) {
                 this.list.modelid = response.data.Result.model_id
+              }else if(status === 40001){
+                Toast(response.data.Result)
+                setTimeout(() => {
+                  this.$router.push({
+                    path: "/Login"
+                  });
+                }, 1500);
               } else {
-                Indicator.close();
                 Toast(response.data.Result)
               }
             }.bind(this)

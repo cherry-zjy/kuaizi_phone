@@ -49,6 +49,13 @@ import { Indicator } from 'mint-ui';
               var status = response.data.Status;
               if (status === 1) {
                 this.list = response.data.Result
+              }else if(status === 40001){
+                Toast(response.data.Result)
+                setTimeout(() => {
+                  this.$router.push({
+                    path: "/Login"
+                  });
+                }, 1500);
               } else {
                 Indicator.close();
                 Toast(response.data.Result)
