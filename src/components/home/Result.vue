@@ -1,5 +1,12 @@
 <template>
   <div class="page-cell">
+    <p class="title">上传需要查询资料的行驶证</p>
+    <div class="imgbox">
+      <img src='../../assets/upload.png' class="upload" />
+      <input id="image" type="file" name="file" v-on:change="addimg($event)" class="fileimg">
+    </div>
+    <p class="title">输入查询车辆相关信息</p>
+    <mt-field disableClear label="VIN码" placeholder="请输入VIN码查询" v-model="vin"></mt-field>
     <mt-cell title="排放标准" :value="list.model_emission_standard"></mt-cell>
     <mt-cell title="车型ID" :value="list.model_id"></mt-cell>
     <mt-cell title="车辆品牌名" :value="list.brand_name"></mt-cell>
@@ -20,26 +27,89 @@
 <script>
 import { Toast } from 'mint-ui';
 import { Indicator } from 'mint-ui';
+import qs from "qs";
   export default {
     data: function () {
       return {
-        list: {}
+        list: {},
+        vin:''
       };
+    },
+    watch: {
+      vin: function (n,o) {
+        this.getInfo()
+      },
     },
     mounted() {
       if (getCookie("token") == undefined || getCookie("token") == null) {
           this.$router.push("/Login");
           return;
         }
-      this.getInfo()
+      // this.getInfo()
     },
     methods: {
+      addimg(e) { //添加图片
+      var tt = this;
+        var reader = new FileReader();
+        var AllowImgFileSize = 2100000; //上传图片最大值(单位字节)（ 2 M = 2097152 B ）超过2M上传失败
+        var file = $("#image")[0].files[0];
+        var imgUrlBase64;
+        if (file) {
+            //将文件以Data URL形式读入页面  
+            imgUrlBase64 = reader.readAsDataURL(file);
+            reader.onload = function (e) {
+              //var ImgFileSize = reader.result.substring(reader.result.indexOf(",") + 1).length;//截取base64码部分（可选可不选，需要与后台沟通）
+              if (AllowImgFileSize != 0 && AllowImgFileSize < reader.result.length) {
+                    alert( '上传失败，请上传不大于2M的图片！');
+                    return;
+                }else{
+                  // document.getElementById('image').src=this.result;
+                    //执行上传操作
+                    $(".upload").attr('src',this.result)
+                    tt.driveData = reader.result.split("base64,")[1]
+                    tt.next()
+                }
+            }
+         } 
+      },
+      next(){
+        Indicator.open();
+        this.$http
+          .post("http://testapi.che300.com/service/common/eval",
+            qs.stringify({
+              token: 'd68de345203ea3fbded45a637fbab3bd',
+              oper: 'identifyDriverCard',
+              driveData: this.driveData
+            })
+          )
+          .then(
+            function (response) {
+              Indicator.close();
+              var status = response.data.status;
+              if (status === 1) {
+                this.list.car_no = response.data.data.plate_num
+                this.list.engine_no = response.data.data.engine_num
+                this.vin = response.data.data.vin
+              }else {
+                Toast(response.data.error_msg)
+              }
+            }.bind(this)
+          )
+          // 请求error
+          .catch(
+            function (error) {
+              console.log(error)
+              Indicator.close();
+              Toast('服务器开小差啦，请稍后再试')
+            }.bind(this)
+          );
+      },
       getInfo() {
         Indicator.open();
         this.$http
           .get("api/Back/Carvin", {
             params: {
-              vin: '1G6A95RX3E0128766',
+              vin: this.vin,
               Token: getCookie("token"),
             }
           })
@@ -136,6 +206,28 @@ import { Indicator } from 'mint-ui';
   .foot-btn button {
     width: 46%;
     margin-left: 2%;
+  }
+  .imgbox {
+    position: relative;
+  }
+
+  .imgbox img {
+    width: 96%;
+    margin-left: 2%;
+    height: 10rem;
+  }
+
+  .fileimg {
+    position: absolute;
+    width: 96%;
+    height: 10rem;
+    top: 0;
+    left: 2%;
+    opacity: 0;
+  }
+  .title{
+    margin-left: 2%;
+    color: #808080
   }
 
 </style>

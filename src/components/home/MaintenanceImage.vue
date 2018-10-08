@@ -5,8 +5,9 @@
       <img src="../../assets/upload.png" class="upload">
       <input id="image" type="file" name="file" v-on:change="addimg($event)" class="fileimg">
     </div>
-    <p class="title" v-if="show">输入查询车辆相关信息</p>
-    <mt-field v-if="show" disableClear label="发动机号" placeholder="请输入发动机号" v-model="list.engine_no"></mt-field>
+    <p class="title">输入查询车辆相关信息</p>
+    <mt-field disableClear label="发动机号" placeholder="请输入发动机号" v-model="list.engine_no"></mt-field>
+    <mt-field disableClear label="VIN码" placeholder="请输入VIN码" v-model="list.vin"></mt-field>
     <div class="foot-btn">
       <mt-button type="primary" @click="query()">确认</mt-button>
       <!-- <mt-button type="primary" size="small" @click="query()">单次查询</mt-button> -->
@@ -27,9 +28,9 @@ import {
     data: function () {
       return {
         list: {
-          engine_no:''
+          engine_no:'',
+          vin:''
         },
-        show:false
       };
     },
     mounted() {},
@@ -75,9 +76,9 @@ import {
               if (status === 1) {
                 this.list.car_no = response.data.data.plate_num
                 this.list.engine_no = response.data.data.engine_num
-                this.show = true
+                this.list.vin = response.data.data.vin
               }else {
-                Toast(response.data.Result)
+                Toast(response.data.error_msg)
               }
             }.bind(this)
           )

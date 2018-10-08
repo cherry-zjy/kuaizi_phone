@@ -20,8 +20,8 @@
           <div class="left">
             <div class="ordermsg">
               <p>按次购买</p>
-              <!-- <p>按此查询</p>
-              <p>时间</p> -->
+              <p v-if="item.Type == 0" class="baoxain">保险订单</p>
+              <p v-if="item.Type == 1" class="weibao">维保订单</p>
             </div>
             <div class="orderno">订单号：{{item.Order}}</div>
           </div>
@@ -228,10 +228,6 @@ import { Indicator } from 'mint-ui';
     padding: 1rem 0;
   }
 
-  .listBox .left {
-    width: 70%;
-  }
-
   .listBox .left div {
     line-height: 30px;
   }
@@ -242,7 +238,6 @@ import { Indicator } from 'mint-ui';
   }
 
   .listBox .right {
-    width: 30%;
     text-align: right;
   }
 
@@ -295,6 +290,14 @@ import { Indicator } from 'mint-ui';
   .orderno{
     color: #999999;
     font-size: 1rem;
+  }
+  .baoxain{
+    font-size: 0.8rem;
+    color: darkcyan
+  }
+  .weibao{
+    font-size: 0.8rem;
+    color:firebrick
   }
 
 </style>

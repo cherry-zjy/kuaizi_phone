@@ -1,11 +1,12 @@
 <template>
   <div class="page-cell">
-    <!-- <p class="title">上传需要查询资料的行驶证</p>
+    <p class="title">上传需要查询资料的行驶证</p>
     <div class="imgbox">
       <img src="../../assets/upload.png" class="upload">
-      <input type="file" name="file" v-on:change="addimg($event)" class="fileimg">
-    </div> -->
+      <input id="image" type="file" name="file" v-on:change="addimg($event)" class="fileimg">
+    </div>
     <p class="title">输入查询车辆相关信息</p>
+    <mt-field disableClear label="VIN码" placeholder="请输入VIN码" v-model="vin"></mt-field>
     <mt-field disableClear label="车型ID" placeholder="请输入车型ID" v-model="list.modelid"></mt-field>
     <mt-cell title="省市" :value="list.zone" is-link @click.native="handlerArea"></mt-cell>
     <mt-cell title="上牌日期" :value="list.regDate" is-link @click.native="open('picker2')"></mt-cell>
@@ -29,6 +30,7 @@
   import {
     Indicator
   } from 'mint-ui';
+  import qs from "qs";
   const address = {
     '北京': ['北京'],
     '广东': ['广州', '深圳', '珠海', '汕头', '韶关', '佛山', '江门', '湛江', '茂名', '肇庆', '惠州', '梅州', '汕尾', '河源', '阳江', '清远', '东莞', '中山',
@@ -87,8 +89,9 @@
           modelid: "",
           zone: '',
           regDate: '',
-          mile: ''
+          mile: '',
         },
+        vin:'',
         city: '',
         areaVisible: false,
         areaVisible1: true,
@@ -111,16 +114,77 @@
       };
     },
     mounted() {
-      this.getInfo()
+      // this.getInfo()
+    },
+    watch: {
+      vin: function (n,o) {
+        this.getInfo()
+      },
     },
     methods: {
+      addimg(e) { //添加图片
+      var tt = this;
+        var reader = new FileReader();
+        var AllowImgFileSize = 2100000; //上传图片最大值(单位字节)（ 2 M = 2097152 B ）超过2M上传失败
+        var file = $("#image")[0].files[0];
+        var imgUrlBase64;
+        if (file) {
+            //将文件以Data URL形式读入页面  
+            imgUrlBase64 = reader.readAsDataURL(file);
+            reader.onload = function (e) {
+              //var ImgFileSize = reader.result.substring(reader.result.indexOf(",") + 1).length;//截取base64码部分（可选可不选，需要与后台沟通）
+              if (AllowImgFileSize != 0 && AllowImgFileSize < reader.result.length) {
+                    alert( '上传失败，请上传不大于2M的图片！');
+                    return;
+                }else{
+                  // document.getElementById('image').src=this.result;
+                    //执行上传操作
+                    $(".upload").attr('src',this.result)
+                    tt.driveData = reader.result.split("base64,")[1]
+                    tt.next()
+                }
+            }
+         } 
+      },
+      next(){
+        Indicator.open();
+        this.$http
+          .post("http://testapi.che300.com/service/common/eval",
+            qs.stringify({
+              token: 'd68de345203ea3fbded45a637fbab3bd',
+              oper: 'identifyDriverCard',
+              driveData: this.driveData
+            })
+          )
+          .then(
+            function (response) {
+              Indicator.close();
+              var status = response.data.status;
+              if (status === 1) {
+                this.list.car_no = response.data.data.plate_num
+                this.list.engine_no = response.data.data.engine_num
+                this.vin = response.data.data.vin
+              }else {
+                Toast(response.data.error_msg)
+              }
+            }.bind(this)
+          )
+          // 请求error
+          .catch(
+            function (error) {
+              console.log(error)
+              Indicator.close();
+              Toast('服务器开小差啦，请稍后再试')
+            }.bind(this)
+          );
+      },
       getInfo() {
         console.log(mainurl)
         Indicator.open();
         this.$http
           .get("api/Back/Carvin", {
             params: {
-              vin: '1G6A95RX3E0128766',
+              vin: this.vin,
               Token: getCookie("token"),
             }
           })
@@ -149,15 +213,6 @@
               Toast('服务器开小差啦，请稍后再试')
             }.bind(this)
           );
-      },
-      addimg(e) { //添加图片
-        var files = e.target.files || e.dataTransfer.files;
-        if (!files.length) {
-          return;
-        } else {
-          var formData = new FormData();
-          formData.append('file', files[0]);
-        }
       },
       open(picker) {
         this.$refs[picker].open();
