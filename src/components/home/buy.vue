@@ -3,8 +3,8 @@
     <p class="title">月卡查询套餐</p>
     <div class="list">
       <div v-for="(l,i) in 6" :key="i" :class="choiceNum == i?'active':''" @click="choiceClick(i)">
-        <p class="list-price">￥11231</p>
-        <p class="list-mouth">{{i}}个月</p>
+        <p class="list-price">￥{{(i+1)*100}}</p>
+        <p class="list-mouth">{{i+1}}个月</p>
       </div>
     </div>
     <!-- <div class="footer"> -->

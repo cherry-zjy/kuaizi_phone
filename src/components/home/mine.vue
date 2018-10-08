@@ -6,8 +6,8 @@
     </div>
     <div class="userInfo">
       <div class="userImg">
-        <img src="../../assets/logo.png" alt="" class="user-img">
-        <span class="username">用户名</span>
+        <img :src="mainurl+icon" alt="" class="user-img">
+        <span class="username">{{UserName}}</span>
         <mt-button type="primary" size="small" @click="query()" class="list-mouth">开通月卡</mt-button>
       </div>
     </div>
@@ -15,18 +15,17 @@
     <!-- 查询记录 -->
     <div class="list">
       <div class="padding">
-      <div class="forList" v-for="(l,i) in 5" :key="i">
+      <div class="forList" v-for="(item,index) in list" :key="index">
         <div class="listBox">
           <div class="left">
-            
             <div class="ordermsg">
-              <p>车辆估值</p>
-              <p>按此查询</p>
-              <p>时间</p>
+              <p>按次购买</p>
+              <!-- <p>按此查询</p>
+              <p>时间</p> -->
             </div>
-            <div class="orderno">订单号：0000000</div>
+            <div class="orderno">订单号：{{item.Order}}</div>
           </div>
-          <div class="right"><span>查看</span></div>
+          <div class="right"><span @click="Detail(item.Order,item.Type)">查看</span></div>
           <div class="clear"></div>
         </div>
       </div>
@@ -35,15 +34,122 @@
   </div>
 </template>
 <script>
+import { Toast } from 'mint-ui';
+import { Indicator } from 'mint-ui';
   export default {
     data() {
       return {
-
+        list:[],
+        icon:'',
+        UserName:'',
+        mainurl:''
       }
     },
-    components: {},
-    methods: {},
-    mounted() {}
+    mounted() {
+      this.mainurl = mainurl
+      if (getCookie("token") == undefined || getCookie("token") == null) {
+          this.$router.push("/Login");
+          return;
+        }
+      this.getInfo()
+      this.getUserInfo()
+      // this.getUserInfo()
+    },
+    methods: {
+      getInfo() {
+        Indicator.open();
+        this.$http
+          .get("api/Back/OrderList", {
+            params: {
+              Token: getCookie("token"),
+            }
+          })
+          .then(
+            function (response) {
+              Indicator.close();
+              var status = response.data.Status;
+              if (status === 1) {
+                this.list = response.data.Result
+              } else {
+                Indicator.close();
+                Toast(response.data.Result)
+              }
+            }.bind(this)
+          )
+          // 请求error
+          .catch(
+            function (error) {
+              Indicator.close();
+              Toast('服务器开小差啦，请稍后再试')
+            }.bind(this)
+          );
+      },
+      getUserInfo() {
+        Indicator.open();
+        this.$http
+          .get("api/User/Info?Token="+getCookie("token"), {
+            
+          })
+          .then(
+            function (response) {
+              Indicator.close();
+              var status = response.data.Status;
+              if (status === 1) {
+                this.icon = response.data.Result.Image
+                this.UserName = response.data.Result.NickName
+              } else {
+                Indicator.close();
+                Toast(response.data.Result)
+              }
+            }.bind(this)
+          )
+          // 请求error
+          .catch(
+            function (error) {
+              // console.log(error)
+              Indicator.close();
+              Toast('服务器开小差啦，请稍后再试')
+            }.bind(this)
+          );
+      },
+      query(){
+        this.$router.push("/Buy");
+      },
+      Detail(id,type){
+        if(type == 0){
+          this.url = 'api/Back/OrdertoInsurance'
+        }else{
+          this.url = 'api/Back/OrdertoWB'
+        }
+        Indicator.open();
+        this.$http
+          .get(this.url, {
+            params: {
+              order_no: id,
+            }
+          })
+          .then(
+            function (response) {
+              Indicator.close();
+              var status = response.data.Status;
+              if (status === 1) {
+                window.location.href = response.data.Result
+              } else {
+                Indicator.close();
+                Toast(response.data.Result)
+              }
+            }.bind(this)
+          )
+          // 请求error
+          .catch(
+            function (error) {
+              Indicator.close();
+              Toast('服务器开小差啦，请稍后再试')
+            }.bind(this)
+          );
+      }
+    },
+    
   }
 
 </script>

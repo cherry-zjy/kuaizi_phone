@@ -1,10 +1,10 @@
 <template>
   <div class="page-cell">
-    <p class="title">上传需要查询资料的行驶证</p>
+    <!-- <p class="title">上传需要查询资料的行驶证</p>
     <div class="imgbox">
       <img src="../../assets/upload.png" class="upload">
       <input type="file" name="file" v-on:change="addimg($event)" class="fileimg">
-    </div>
+    </div> -->
     <p class="title">输入查询车辆相关信息</p>
     <mt-field disableClear label="车型ID" readonly placeholder="请输入车型ID" v-model="list.modelid"></mt-field>
     <mt-cell title="省市" :value="list.zone" is-link @click.native="handlerArea"></mt-cell>
