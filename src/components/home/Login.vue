@@ -2,7 +2,7 @@
   <div class="root editPsw" :style="'min-height:'+allHeight +'px'">
     <div class="form login">
       <mt-field class="underLine" label="手机号" placeholder="请输入手机号码" type="number" v-model="phone"></mt-field>
-      <mt-field label="验证码" v-model="password">
+      <mt-field label="验证码" v-model="password" type="number">
         <mt-button plain type="primary" size="small" @click="fcode()" :disabled="disabled">{{time}}</mt-button>
       </mt-field>
     </div>
