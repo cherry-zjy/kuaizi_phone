@@ -15,51 +15,62 @@
     <!-- 查询记录 -->
     <div class="list">
       <div class="padding">
-      <div class="forList" v-for="(item,index) in list" :key="index">
-        <div class="listBox">
-          <div class="left">
-            <div class="ordermsg">
-              <p>按次购买</p>
-              <p v-if="item.Type == 0" class="baoxain">保险订单</p>
-              <p v-if="item.Type == 1" class="weibao">维保订单</p>
-              <p v-if="item.Status == 1" class="baoxain">成功</p>
-              <p v-if="item.Status == 0" class="weibao">查询中</p>
+        <div class="forList" v-for="(item,index) in list" :key="index">
+          <div class="listBox">
+            <div class="left">
+              <div class="ordermsg">
+                <p>按次购买</p>
+                <p v-if="item.Type == 0" class="baoxain">保险订单</p>
+                <p v-if="item.Type == 1" class="weibao">维保订单</p>
+                <p v-if="item.Status == 1" class="baoxain">成功</p>
+                <p v-if="item.Status == 0" class="weibao">查询中</p>
+              </div>
+              <div class="orderno">订单号：{{item.Order}}</div>
             </div>
-            <div class="orderno">订单号：{{item.Order}}</div>
+            <div class="right"><span @click="Detail(item.Order,item.Type)">查看</span></div>
+            <div class="clear"></div>
           </div>
-          <div class="right"><span @click="Detail(item.Order,item.Type)">查看</span></div>
-          <div class="clear"></div>
         </div>
       </div>
-    </div>
     </div>
   </div>
 </template>
 <script>
-import { Toast } from 'mint-ui';
-import { Indicator } from 'mint-ui';
+  import {
+    Toast
+  } from 'mint-ui';
+  import {
+    Indicator
+  } from 'mint-ui';
   export default {
     data() {
       return {
-        list:[],
-        icon:'',
-        UserName:'',
-        mainurl:''
+        list: [],
+        icon: '',
+        UserName: '',
+        mainurl: ''
       }
     },
     mounted() {
       this.mainurl = mainurl
       if (getCookie("token") == undefined || getCookie("token") == null) {
-          this.$router.push("/Login");
-          return;
-        }
+        this.$router.push("/Login");
+        return;
+      }
       this.getInfo()
       this.getUserInfo()
+      this.flash()
       // this.getUserInfo()
     },
     methods: {
+      flash() {
+        var that = this
+        setInterval(function () {
+          that.getInfo()
+        }, 5000)
+      },
       getInfo() {
-        Indicator.open();
+        // Indicator.open();
         this.$http
           .get("api/Back/OrderList", {
             params: {
@@ -68,11 +79,11 @@ import { Indicator } from 'mint-ui';
           })
           .then(
             function (response) {
-              Indicator.close();
+              // Indicator.close();
               var status = response.data.Status;
               if (status === 1) {
                 this.list = response.data.Result
-              }else if(status === 40001){
+              } else if (status === 40001) {
                 Toast(response.data.Result)
                 setTimeout(() => {
                   this.$router.push({
@@ -80,7 +91,7 @@ import { Indicator } from 'mint-ui';
                   });
                 }, 1500);
               } else {
-                Indicator.close();
+                // Indicator.close();
                 Toast(response.data.Result)
               }
             }.bind(this)
@@ -88,7 +99,7 @@ import { Indicator } from 'mint-ui';
           // 请求error
           .catch(
             function (error) {
-              Indicator.close();
+              // Indicator.close();
               Toast('服务器开小差啦，请稍后再试')
             }.bind(this)
           );
@@ -96,8 +107,8 @@ import { Indicator } from 'mint-ui';
       getUserInfo() {
         Indicator.open();
         this.$http
-          .get("api/User/Info?Token="+getCookie("token"), {
-            
+          .get("api/User/Info?Token=" + getCookie("token"), {
+
           })
           .then(
             function (response) {
@@ -106,7 +117,7 @@ import { Indicator } from 'mint-ui';
               if (status === 1) {
                 this.icon = response.data.Result.Image
                 this.UserName = response.data.Result.NickName
-              }else if(status === 40001){
+              } else if (status === 40001) {
                 Toast(response.data.Result)
                 setTimeout(() => {
                   this.$router.push({
@@ -128,13 +139,13 @@ import { Indicator } from 'mint-ui';
             }.bind(this)
           );
       },
-      query(){
+      query() {
         this.$router.push("/Buy");
       },
-      Detail(id,type){
-        if(type == 0){
+      Detail(id, type) {
+        if (type == 0) {
           this.url = 'api/Back/OrdertoInsurance'
-        }else{
+        } else {
           this.url = 'api/Back/OrdertoWB'
         }
         Indicator.open();
@@ -165,7 +176,7 @@ import { Indicator } from 'mint-ui';
           );
       }
     },
-    
+
   }
 
 </script>
@@ -283,23 +294,28 @@ import { Indicator } from 'mint-ui';
     right: 2rem;
     top: 2.5rem;
   }
-  .padding{
+
+  .padding {
     padding: 1rem;
   }
-  .ordermsg p{
+
+  .ordermsg p {
     margin: 0.5rem 0;
   }
-  .orderno{
+
+  .orderno {
     color: #999999;
     font-size: 1rem;
   }
-  .baoxain{
+
+  .baoxain {
     font-size: 0.8rem;
     color: darkcyan
   }
-  .weibao{
+
+  .weibao {
     font-size: 0.8rem;
-    color:firebrick
+    color: firebrick
   }
 
 </style>
