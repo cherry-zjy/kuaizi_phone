@@ -2,8 +2,9 @@
   <div class="page-cell">
     <p class="title">上传需要查询资料的行驶证</p>
     <div class="imgbox">
-      <img src='../../assets/upload.png' class="upload" />
-      <input id="image" accept="image/*" type="file" name="file" v-on:change="SetMayImg0($event)" class="fileimg">
+      <img :src="imgurl" class="upload" id="car" v-if="imgurl">
+      <img src="../../assets/upload.png" class="upload" v-if="!imgurl">
+      <input id="image" type="file" name="file" accept="image/*" v-on:change="SetMayImg0($event)" class="fileimg">
     </div>
     <p class="title">输入查询车辆相关信息</p>
     <mt-field disableClear label="VIN码" placeholder="请输入VIN码查询" v-model="vin"></mt-field>

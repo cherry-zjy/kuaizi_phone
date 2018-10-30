@@ -2,8 +2,9 @@
   <div class="page-cell">
     <p class="title">上传需要查询资料的行驶证</p>
     <div class="imgbox">
-      <img src="../../assets/upload.png" class="upload">
-      <input id="image" accept="image/*" type="file" name="file" v-on:change="SetMayImg0($event)" class="fileimg">
+      <img :src="imgurl" class="upload" id="car" v-if="imgurl">
+      <img src="../../assets/upload.png" class="upload" v-if="!imgurl">
+      <input id="image" type="file" name="file" accept="image/*" v-on:change="SetMayImg0($event)" class="fileimg">
     </div>
     <p class="title">输入查询车辆相关信息</p>
     <mt-field disableClear label="发动机号" placeholder="请输入发动机号" v-model="list.engine_no"></mt-field>
@@ -17,7 +18,7 @@
 </template>
 
 <script>
-import {
+  import {
     Toast
   } from 'mint-ui';
   import {
@@ -28,8 +29,8 @@ import {
     data: function () {
       return {
         list: {
-          engine_no:'',
-          vin:''
+          engine_no: '',
+          vin: ''
         },
       };
     },
@@ -66,7 +67,7 @@ import {
               var base64 = null;
               base64 = canvas.toDataURL("image/jpeg", 0.5);
               if (fileList[0].size / 1572864 > 1) {
-                _this.imgScale0(base64, 0.5)
+                _this.imgScale0(base64, 0.8)
               } else {
                 //ajax请求，通过formdata进行上传图片 
                 var formdata = new FormData();
@@ -124,30 +125,30 @@ import {
         }
       },
       addimg(e) { //添加图片
-      var tt = this;
+        var tt = this;
         var reader = new FileReader();
         var AllowImgFileSize = 2100000; //上传图片最大值(单位字节)（ 2 M = 2097152 B ）超过2M上传失败
         var file = $("#image")[0].files[0];
         var imgUrlBase64;
         if (file) {
-            //将文件以Data URL形式读入页面  
-            imgUrlBase64 = reader.readAsDataURL(file);
-            reader.onload = function (e) {
-              //var ImgFileSize = reader.result.substring(reader.result.indexOf(",") + 1).length;//截取base64码部分（可选可不选，需要与后台沟通）
-              // if (AllowImgFileSize != 0 && AllowImgFileSize < reader.result.length) {
-              //       alert( '上传失败，请上传不大于2M的图片！');
-              //       return;
-                // }else{
-                  // document.getElementById('image').src=this.result;
-                    //执行上传操作
-                    $(".upload").attr('src',this.result)
-                    tt.driveData = reader.result.split("base64,")[1]
-                    tt.next()
-                // }
-            }
-         } 
+          //将文件以Data URL形式读入页面  
+          imgUrlBase64 = reader.readAsDataURL(file);
+          reader.onload = function (e) {
+            //var ImgFileSize = reader.result.substring(reader.result.indexOf(",") + 1).length;//截取base64码部分（可选可不选，需要与后台沟通）
+            // if (AllowImgFileSize != 0 && AllowImgFileSize < reader.result.length) {
+            //       alert( '上传失败，请上传不大于2M的图片！');
+            //       return;
+            // }else{
+            // document.getElementById('image').src=this.result;
+            //执行上传操作
+            $(".upload").attr('src', this.result)
+            tt.driveData = reader.result.split("base64,")[1]
+            tt.next()
+            // }
+          }
+        }
       },
-      next(){
+      next() {
         Indicator.open();
         this.$http
           .post("http://testapi.che300.com/service/common/eval",
@@ -165,7 +166,7 @@ import {
                 this.list.car_no = response.data.data.plate_num
                 this.list.engine_no = response.data.data.engine_num
                 this.list.vin = response.data.data.vin
-              }else {
+              } else {
                 Toast(response.data.error_msg)
               }
             }.bind(this)
@@ -201,7 +202,14 @@ import {
               var status = response.data.Status;
               if (status === 1) {
                 window.location.href = response.data.Result
-              }else if(status === 40001){
+              } else if (status === 2) {
+                Toast(response.data.Result)
+                setTimeout(() => {
+                  this.$router.push({
+                    path: "/mine"
+                  });
+                }, 1500);
+              } else if (status === 40001) {
                 Toast(response.data.Result)
                 setTimeout(() => {
                   this.$router.push({
@@ -243,7 +251,8 @@ import {
     display: inline-block;
     margin: 0 10px;
   }
-.imgbox img {
+
+  .imgbox img {
     width: 96%;
     margin-left: 2%;
     height: 10rem;
@@ -267,8 +276,10 @@ import {
   .foot-btn button {
     width: 100%
   }
-  .title{
+
+  .title {
     margin-left: 2%;
     color: #808080
   }
+
 </style>

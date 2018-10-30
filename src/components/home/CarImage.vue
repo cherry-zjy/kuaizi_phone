@@ -157,7 +157,7 @@
               base64 = canvas.toDataURL("image/jpeg", 0.5);
               if (fileList[0].size / 1572864 > 1) {
                 console.log('图片太大')
-                _this.imgScale0(base64, 0.5)
+                _this.imgScale0(base64, 0.8)
               } else {
                 //ajax请求，通过formdata进行上传图片 
                 var formdata = new FormData();

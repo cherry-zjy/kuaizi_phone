@@ -22,6 +22,8 @@
               <p>按次购买</p>
               <p v-if="item.Type == 0" class="baoxain">保险订单</p>
               <p v-if="item.Type == 1" class="weibao">维保订单</p>
+              <p v-if="item.Status == 1" class="baoxain">成功</p>
+              <p v-if="item.Status == 0" class="weibao">查询中</p>
             </div>
             <div class="orderno">订单号：{{item.Order}}</div>
           </div>

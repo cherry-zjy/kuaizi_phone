@@ -2,8 +2,9 @@
   <div class="page-cell">
     <p class="title">上传需要查询资料的行驶证</p>
     <div class="imgbox">
-      <img src='../../assets/upload.png' class="upload" />
-      <input id="image" type="file" accept="image/*" name="file" v-on:change="SetMayImg0($event)" class="fileimg">
+      <img :src="imgurl" class="upload" id="car" v-if="imgurl">
+      <img src="../../assets/upload.png" class="upload" v-if="!imgurl">
+      <input id="image" type="file" name="file" accept="image/*" v-on:change="SetMayImg0($event)" class="fileimg">
     </div>
     <p class="title">输入查询车辆相关信息</p>
     <mt-field disableClear label="VIN码" placeholder="请输入VIN码" v-model="list.vin"></mt-field>
@@ -72,13 +73,15 @@ import {
               var base64 = null;
               base64 = canvas.toDataURL("image/jpeg", 0.5);
               if (fileList[0].size / 1572864 > 1) {
-                _this.imgScale0(base64, 0.5)
+                console.log('图片太大')
+                _this.imgScale0(base64, 0.8)
               } else {
                 //ajax请求，通过formdata进行上传图片 
                 var formdata = new FormData();
                 // var blob = _this.dataURItoBlob(base64);
                 // formdata.append('file', blob, 'image.png');
                 _this.imgurl = base64
+                console.log(base64)
                 _this.driveData = base64.split("base64,")[1]
                 _this.next()
                 // $.ajax({
@@ -124,8 +127,17 @@ import {
           // var blob = dataURItoBlob(canvas.toDataURL('image/jpeg'));
           // formdata.append('file', blob, 'image.png');
           _this.imgurl = canvas.toDataURL('image/jpeg')
+          // alert(_this.imgurl)
           _this.driveData = canvas.toDataURL('image/jpeg').split("base64,")[1]
-          console.log(_this.driveData)
+          // var str = canvas.toDataURL('image/jpeg').replace('data:image/png;base64,', '');
+          // var equalIndex = str.indexOf('=');
+          // if (str.indexOf('=') > 0) {
+          //   str = str.substring(0, equalIndex);
+          // }
+          // var strLength = str.length;
+          // var fileLength = parseInt(strLength - (strLength / 8) * 2);
+          // console.log(fileLength + '字节');
+          // alert('base64：'+_this.imgurl);
           _this.next()
         }
       },
@@ -200,6 +212,7 @@ import {
               id_no: this.list.id_no,
               car_no: this.list.car_no,
               vin: this.list.vin,
+              // vin: '1G6A95RX3E0128766',
               Token: getCookie("token"),
             }
           })
@@ -216,7 +229,14 @@ import {
                     path: "/Login"
                   });
                 }, 1500);
-              } else {
+              } else if(status === 2){
+                Toast(response.data.Result)
+                setTimeout(() => {
+                  this.$router.push({
+                    path: "/mine"
+                  });
+                }, 1500);
+              }else {
                 Indicator.close();
                 Toast(response.data.Result)
               }
