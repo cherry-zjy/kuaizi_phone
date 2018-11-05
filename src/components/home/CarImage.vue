@@ -8,7 +8,31 @@
     </div>
     <p class="title">输入查询车辆相关信息</p>
     <mt-field disableClear label="VIN码" placeholder="请输入VIN码" v-model="vin"></mt-field>
-    <mt-field disableClear label="车型ID" placeholder="请输入车型ID" v-model="list.modelid"></mt-field>
+    <!-- <mt-field disableClear label="车型ID" placeholder="请输入车型ID" ></mt-field> -->
+    <mt-cell title="车型ID" :value="list.modelid" is-link @click.native="handlerArea1"></mt-cell>
+    <mt-popup v-model="areaVisible1" class="area-class" position="bottom">
+      <div class="picker-toolbar">
+        <span class="mint-datetime-action mint-datetime-cancel" @click="cancelAddressChange1()">取消</span>
+        <span class="mint-datetime-action mint-datetime-confirm" @click="confirm1()">确定</span>
+      </div>
+      <mt-picker valueKey="Brand_Name" :slots="addressSlots1" @change="onAddressChange1" class="picker"
+        :visible-item-count="5"></mt-picker>
+    </mt-popup>
+    <mt-popup v-model="areaVisible2" class="area-class" position="bottom">
+      <div class="picker-toolbar">
+        <span class="mint-datetime-action mint-datetime-cancel" @click="cancelAddressChange2()">上一步</span>
+        <span class="mint-datetime-action mint-datetime-confirm" @click="confirm2()">确定</span>
+      </div>
+      <mt-picker valueKey="Series_Name" :slots="addressSlots2" class="picker" @change="onAddressChange2"
+        :visible-item-count="5"></mt-picker>
+    </mt-popup>
+    <mt-popup v-model="areaVisible3" class="area-class" position="bottom">
+      <div class="picker-toolbar">
+        <span class="mint-datetime-action mint-datetime-cancel" @click="cancelAddressChange3()">上一步</span>
+        <span class="mint-datetime-action mint-datetime-confirm" @click="confirm3()">确定</span>
+      </div>
+      <mt-picker valueKey="Model_Name" :slots="addressSlots3" class="picker" @change="onAddressChange3" :visible-item-count="5"></mt-picker>
+    </mt-popup>
     <mt-cell title="省市" :value="list.zone" is-link @click.native="handlerArea"></mt-cell>
     <mt-cell title="上牌日期" :value="list.regDate" is-link @click.native="open('picker2')"></mt-cell>
     <mt-popup v-model="areaVisible" class="area-class" position="bottom">
@@ -96,7 +120,12 @@
         vin: '',
         city: '',
         areaVisible: false,
-        areaVisible1: true,
+        areaVisible1: false,
+        brandid: '', //品牌ID
+        series: '', //车型ID
+        modleid: '', //车系ID
+        areaVisible2: false,
+        areaVisible3: false,
         addressSlots: [{
           flex: 1,
           values: Object.keys(address),
@@ -111,6 +140,24 @@
           values: ['北京'],
           className: 'slot3',
           textAlign: 'center'
+        }],
+        addressSlots1: [{
+          flex: 1,
+          defaultIndex: 0,
+          values: [],
+          className: 'brandslot'
+        }],
+        addressSlots2: [{
+          flex: 1,
+          defaultIndex: 0,
+          values: [],
+          className: 'seriesslot'
+        }],
+        addressSlots3: [{
+          flex: 1,
+          defaultIndex: 0,
+          values: [],
+          className: 'modelslot'
         }],
         value2: null,
       };
@@ -342,13 +389,134 @@
         this.areaVisible = true
       },
       handlerArea1() {
-        this.areaVisible1 = true
+        Indicator.open();
+        this.$http
+          .get("api/Back/ChoseCarBeand", {})
+          .then(
+            function (response) {
+              Indicator.close();
+              var status = response.data.Status;
+              if (status === 1) {
+                this.addressSlots1 = [{
+                    flex: 1,
+                    defaultIndex: 0,
+                    values: response.data.Result,
+                    className: 'brandslot'
+                  }],
+                  this.areaVisible1 = true
+              } else {
+                Toast(response.data.Result)
+              }
+            }.bind(this)
+          )
+          // 请求error
+          .catch(
+            function (error) {
+              Indicator.close();
+              Toast('服务器开小差啦，请稍后再试')
+            }.bind(this)
+          );
       },
       onAddressChange(picker, values) {
         picker.setSlotValues(1, address[values[0]]);
         this.list.zone = values[0] + values[1];
         this.city = values[1];
         console.log(this.city)
+      },
+      onAddressChange1(picker, values) {
+        console.log(values)
+        this.brandid = values[0].Brand_id
+      },
+      onAddressChange2(picker, values){
+        this.series = values[0].Series_id
+      },
+      onAddressChange3(picker, values){
+        this.modleid = values[0]
+      },
+      confirm1() {
+        Indicator.open();
+        this.$http
+          .get("api/Back/ChoseCarSeries", {
+            params:{
+              brandid:this.brandid
+            }
+          })
+          .then(
+            function (response) {
+              Indicator.close();
+              var status = response.data.Status;
+              if (status === 1) {
+                this.addressSlots2 = [{
+                  flex: 1,
+                  defaultIndex: 0,
+                  values: response.data.Result,
+                  className: 'seriesslot'
+                }],
+                this.areaVisible1 = false
+                this.areaVisible2 = true
+              } else {
+                Toast(response.data.Result)
+              }
+            }.bind(this)
+          )
+          // 请求error
+          .catch(
+            function (error) {
+              Indicator.close();
+              Toast('服务器开小差啦，请稍后再试')
+            }.bind(this)
+          );
+
+      },
+      confirm2() {
+        Indicator.open();
+        this.$http
+          .get("api/Back/ChoseCarModel", {
+            params:{
+              seriesid:this.series
+            }
+          })
+          .then(
+            function (response) {
+              Indicator.close();
+              var status = response.data.Status;
+              if (status === 1) {
+                this.addressSlots3 = [{
+                  flex: 1,
+                  defaultIndex: 0,
+                  values: response.data.Result,
+                  className: 'modelslot'
+                }],
+                this.areaVisible2 = false
+                this.areaVisible3 = true
+              } else {
+                Toast(response.data.Result)
+              }
+            }.bind(this)
+          )
+          // 请求error
+          .catch(
+            function (error) {
+              Indicator.close();
+              Toast('服务器开小差啦，请稍后再试')
+            }.bind(this)
+          );
+
+      },
+      confirm3() {
+        this.areaVisible3 = false
+        this.list.modelid = this.modleid.Model_ID
+      },
+      cancelAddressChange1() {
+        this.areaVisible1 = false
+      },
+      cancelAddressChange2() {
+        this.areaVisible1 = true
+        this.areaVisible2 = false
+      },
+      cancelAddressChange3() {
+        this.areaVisible2 = true
+        this.areaVisible3 = false
       },
       handleChange(value) {
         console.log(value)
