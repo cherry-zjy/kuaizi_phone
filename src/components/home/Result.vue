@@ -1,13 +1,21 @@
 <template>
   <div class="page-cell">
-    <p class="title">上传需要查询资料的行驶证</p>
+    <mt-swipe :auto="4000">
+      <mt-swipe-item><img src="../../assets/banner.png"></mt-swipe-item>
+      <mt-swipe-item><img src="../../assets/banner_1.png"></mt-swipe-item>
+    </mt-swipe>
+    <mt-field placeholder="请输入18位VIN码" class="vin" v-model="vin">
+      <img src="../../assets/photo.png" class="phonticon">
+      <input id="image" type="file" name="file" accept="image/*" v-on:change="SetMayImg0($event)" class="fileimg">
+    </mt-field>
+    <!-- <p class="title">上传需要查询资料的行驶证</p>
     <div class="imgbox">
       <img :src="imgurl" class="upload" id="car" v-if="imgurl">
       <img src="../../assets/upload.png" class="upload" v-if="!imgurl">
       <input id="image" type="file" name="file" accept="image/*" v-on:change="SetMayImg0($event)" class="fileimg">
-    </div>
-    <p class="title">输入查询车辆相关信息</p>
-    <mt-field disableClear label="VIN码" placeholder="请输入VIN码查询" v-model="vin"></mt-field>
+    </div> -->
+    <p class="title">车辆相关信息</p>
+    <!-- <mt-field disableClear label="VIN码" placeholder="请输入VIN码查询" v-model="vin"></mt-field> -->
     <mt-cell title="排放标准" :value="list.model_emission_standard"></mt-cell>
     <mt-cell title="车型ID" :value="list.model_id"></mt-cell>
     <mt-cell title="车辆品牌名" :value="list.brand_name"></mt-cell>
@@ -15,7 +23,7 @@
     <mt-cell title="车型年款" :value="list.model_year"></mt-cell>
     <mt-cell title="品牌ID" :value="list.brand_id"></mt-cell>
     <mt-cell title="变速箱类型" :value="list.model_gear"></mt-cell>
-    <mt-cell title="排量"  :value="list.model_liter"></mt-cell>
+    <mt-cell title="排量" :value="list.model_liter"></mt-cell>
     <!-- <mt-cell title="车型名称" :value="list.brand_name"></mt-cell> -->
     <mt-cell title="车系ID" :value="list.series_id"></mt-cell>
     <mt-cell title="车型指导价" :value="list.model_price"></mt-cell>
@@ -26,26 +34,32 @@
 </template>
 
 <script>
-import { Toast } from 'mint-ui';
-import { Indicator } from 'mint-ui';
-import qs from "qs";
+  import {
+    Toast
+  } from 'mint-ui';
+  import {
+    Indicator
+  } from 'mint-ui';
+  import qs from "qs";
   export default {
     data: function () {
       return {
         list: {},
-        vin:''
+        vin: ''
       };
     },
     watch: {
-      vin: function (n,o) {
-        this.getInfo()
+      vin: function (n, o) {
+        if (n !== '') {
+          this.getInfo()
+        }
       },
     },
     mounted() {
       if (getCookie("token") == undefined || getCookie("token") == null) {
-          this.$router.push("/Login");
-          return;
-        }
+        this.$router.push("/Login");
+        return;
+      }
       // this.getInfo()
     },
     methods: {
@@ -138,30 +152,30 @@ import qs from "qs";
         }
       },
       addimg(e) { //添加图片
-      var tt = this;
+        var tt = this;
         var reader = new FileReader();
         var AllowImgFileSize = 2100000; //上传图片最大值(单位字节)（ 2 M = 2097152 B ）超过2M上传失败
         var file = $("#image")[0].files[0];
         var imgUrlBase64;
         if (file) {
-            //将文件以Data URL形式读入页面  
-            imgUrlBase64 = reader.readAsDataURL(file);
-            reader.onload = function (e) {
-              //var ImgFileSize = reader.result.substring(reader.result.indexOf(",") + 1).length;//截取base64码部分（可选可不选，需要与后台沟通）
-              // if (AllowImgFileSize != 0 && AllowImgFileSize < reader.result.length) {
-              //       alert( '上传失败，请上传不大于2M的图片！');
-              //       return;
-                // }else{
-                  // document.getElementById('image').src=this.result;
-                    //执行上传操作
-                    $(".upload").attr('src',this.result)
-                    tt.driveData = reader.result.split("base64,")[1]
-                    tt.next()
-                // }
-            }
-         } 
+          //将文件以Data URL形式读入页面  
+          imgUrlBase64 = reader.readAsDataURL(file);
+          reader.onload = function (e) {
+            //var ImgFileSize = reader.result.substring(reader.result.indexOf(",") + 1).length;//截取base64码部分（可选可不选，需要与后台沟通）
+            // if (AllowImgFileSize != 0 && AllowImgFileSize < reader.result.length) {
+            //       alert( '上传失败，请上传不大于2M的图片！');
+            //       return;
+            // }else{
+            // document.getElementById('image').src=this.result;
+            //执行上传操作
+            $(".upload").attr('src', this.result)
+            tt.driveData = reader.result.split("base64,")[1]
+            tt.next()
+            // }
+          }
+        }
       },
-      next(){
+      next() {
         Indicator.open();
         this.$http
           .post("http://testapi.che300.com/service/common/eval",
@@ -179,7 +193,7 @@ import qs from "qs";
                 this.list.car_no = response.data.data.plate_num
                 this.list.engine_no = response.data.data.engine_num
                 this.vin = response.data.data.vin
-              }else {
+              } else {
                 Toast(response.data.error_msg)
               }
             }.bind(this)
@@ -208,7 +222,7 @@ import qs from "qs";
               var status = response.data.Status;
               if (status === 1) {
                 this.list = response.data.Result
-              }else if(status === 40001){
+              } else if (status === 40001) {
                 Toast(response.data.Result)
                 setTimeout(() => {
                   this.$router.push({
@@ -296,6 +310,7 @@ import qs from "qs";
     width: 46%;
     margin-left: 2%;
   }
+
   .imgbox {
     position: relative;
   }
@@ -308,15 +323,33 @@ import qs from "qs";
 
   .fileimg {
     position: absolute;
-    width: 96%;
-    height: 10rem;
+    height: 1.6rem;
     top: 0;
-    left: 2%;
     opacity: 0;
   }
-  .title{
+
+  .title {
     margin-left: 2%;
     color: #808080
+  }
+
+  .mint-swipe {
+    height: 13rem;
+  }
+
+  .mint-swipe img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .phonticon {
+    width: 1.6rem;
+    padding-left: 1rem;
+    border-left: 1px solid #666666
+  }
+
+  .vin {
+    margin-top: 1.2rem
   }
 
 </style>

@@ -9,7 +9,7 @@
     <p class="title">输入查询车辆相关信息</p>
     <mt-field disableClear label="VIN码" placeholder="请输入VIN码" v-model="vin"></mt-field>
     <!-- <mt-field disableClear label="车型ID" placeholder="请输入车型ID" ></mt-field> -->
-    <mt-cell title="车型ID" :value="list.modelid" is-link @click.native="handlerArea1"></mt-cell>
+    <mt-cell title="车型" :value="list.modelid" is-link @click.native="handlerArea1"></mt-cell>
     <mt-popup v-model="areaVisible1" class="area-class" position="bottom">
       <div class="picker-toolbar">
         <span class="mint-datetime-action mint-datetime-cancel" @click="cancelAddressChange1()">取消</span>
@@ -505,7 +505,7 @@
       },
       confirm3() {
         this.areaVisible3 = false
-        this.list.modelid = this.modleid.Model_ID
+        this.list.modelid = this.modleid.Model_Name
       },
       cancelAddressChange1() {
         this.areaVisible1 = false
@@ -544,7 +544,7 @@
         this.$http
           .get("api/Back/GetCarPrice", {
             params: {
-              modelid: this.list.modelid,
+              modelid: this.modleid.Model_ID,
               regDate: this.list.regDate,
               zone: this.city,
               mile: this.list.mile

@@ -28,7 +28,7 @@ export default new Router({
     component: mine,
   },{
     path: '/',
-    name: '首页',
+    name: '我要查询',
     component: index,
   }, {
     path: '/CarImage',

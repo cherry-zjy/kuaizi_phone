@@ -41,8 +41,8 @@
             "api/User/Register",
             qs.stringify({
               Phone: this.phone,
-              Pwd: this.password,
-              Code: -1,
+              Pwd: -1,
+              Code: this.password,
               Lng: -1,
               Lat: -1,
               ID: "-1"
