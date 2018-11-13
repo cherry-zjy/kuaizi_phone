@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import expresss from "../../assets/address.js";
+  import expresss from "../../assets/address.js";
   import {
     Toast
   } from 'mint-ui';
@@ -82,7 +82,7 @@ import expresss from "../../assets/address.js";
     data: function () {
       return {
         endDate: new Date(),
-        address:[],
+        address: [],
         list: {
           modelid: "",
           zone: '',
@@ -98,21 +98,23 @@ import expresss from "../../assets/address.js";
         areaVisible1: false,
         brandid: '', //品牌ID
         series: '', //车型ID
+        chooseseries: '', //当前选择的车系
         modleid: '', //车系ID
         time: [], //上牌时间年份
-        choosemouth:'',//当前选择的月份
-        mouth:[],//上牌时间月份
+        choosemouth: '', //当前选择的月份
+        mouth: [], //上牌时间月份
         areaVisible2: false,
         areaVisible3: false,
-        areaVisible4:false,
-        areaVisible5:false,
-        mintime:'',//最小时间
-        maxtime:'',//最大时间
-        city:[],
+        areaVisible4: false,
+        areaVisible5: false,
+        mintime: '', //最小时间
+        maxtime: '', //最大时间
+        city: [],
         addressSlots1: [],
         addressSlots2: [],
         addressSlots3: [],
         value2: null,
+        disable: false //车系是否获得
       };
     },
     mounted() {
@@ -319,18 +321,22 @@ import expresss from "../../assets/address.js";
           );
       },
       open() {
-        if (this.list.modelid !== '') {
-          this.areaVisible5 = true
-          this.choose = true
-          this.time.push(this.mintime)
-          for (let i = 0; i < this.maxtime - this.mintime; i++) {
-            this.time.push(this.mintime+(i+1))
+        if (this.disable) {
+          Toast('抱歉，没能获取到该车型，请上传行驶证进行车辆估值')
+        } else {
+          if (this.list.modelid !== '') {
+            this.areaVisible5 = true
+            this.choose = true
+            this.time.push(this.mintime)
+            for (let i = 0; i < this.maxtime - this.mintime; i++) {
+              this.time.push(this.mintime + (i + 1))
+            }
+            console.log(this.maxtime)
+            console.log(this.mintime)
+            console.log(this.time)
+          } else {
+            Toast('请先选择车型')
           }
-          console.log(this.maxtime)
-          console.log(this.mintime)
-          console.log(this.time)
-        }else{
-          Toast('请先选择车型')
         }
       },
       handlerArea() {
@@ -379,6 +385,7 @@ import expresss from "../../assets/address.js";
         this.confirm1()
       },
       onAddressChange2(values) {
+        this.chooseseries = values.Series_Name
         this.series = values.Series_id
         this.confirm2()
       },
@@ -392,22 +399,22 @@ import expresss from "../../assets/address.js";
         this.city = values
       },
       onAddressChange5(values) {
-        this.list.zone = this.city.name+' '+values.name
+        this.list.zone = this.city.name + ' ' + values.name
         this.areaVisible4 = false
         this.choose = false
       },
-      onAddressChange6(values){
+      onAddressChange6(values) {
         this.areaVisible5 = false
         this.areaVisible6 = true
         this.choosemouth = values
-        var myDate = new Date();//获取系统当前时间
+        var myDate = new Date(); //获取系统当前时间
         if (values == myDate.getFullYear()) {
-          for (let i = 0; i < myDate.getMonth()+1; i++) {
-            this.mouth.push(i+1)
+          for (let i = 0; i < myDate.getMonth() + 1; i++) {
+            this.mouth.push(i + 1)
           }
-          myDate.getMonth()+1; //获取当前月份(0-11,0代表1月)
-        }else{
-          this.mouth = [1,2,3,4,5,6,7,8,9,10,11,12]
+          myDate.getMonth() + 1; //获取当前月份(0-11,0代表1月)
+        } else {
+          this.mouth = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
         }
       },
       onAddressChange7(values) {
@@ -457,9 +464,17 @@ import expresss from "../../assets/address.js";
               Indicator.close();
               var status = response.data.Status;
               if (status === 1) {
-                this.addressSlots3 = response.data.Result
-                this.areaVisible2 = false
-                this.areaVisible3 = true
+                if (response.data.Result.length == 0) {
+                  this.areaVisible2 = false
+                  this.choose = false
+                  this.list.modelid = this.chooseseries
+                  this.disable = true
+                  Toast('抱歉，没能获取到该车型，请上传行驶证进行车辆估值')
+                } else {
+                  this.addressSlots3 = response.data.Result
+                  this.areaVisible2 = false
+                  this.areaVisible3 = true
+                }
               } else {
                 Toast(response.data.Result)
               }
