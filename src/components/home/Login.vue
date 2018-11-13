@@ -62,7 +62,6 @@
                   this.$router.push('/')
                 }, 1000);
               } else {
-                Indicator.close();
                 Toast(response.data.Result)
               }
             }.bind(this)
@@ -100,7 +99,6 @@
                       iconClass: 'icon icon-success'
                     });
                   } else {
-                    Indicator.close();
                     Toast(response.data.Result)
                   }
                 }.bind(this)

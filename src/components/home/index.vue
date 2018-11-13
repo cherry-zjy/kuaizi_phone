@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="hello" style="float:left">
     <mt-swipe :auto="4000">
       <mt-swipe-item><img src="../../assets/banner.png"></mt-swipe-item>
       <mt-swipe-item><img src="../../assets/banner_1.png"></mt-swipe-item>
@@ -8,7 +8,7 @@
       <p>查询</p>
       <div class="box">
         <div class="col-6" @click="Car()">
-          <img src="../../assets/guzhi.png">
+          <img src="../../../src/assets/guzhi.png">
           <p>车辆估值</p>
         </div>
         <div class="col-6" @click="goto('/Result')">
@@ -25,7 +25,10 @@
         </div>
       </div>
     </div>
-    <div class="foot-btn">
+    <div class="foot-btn" v-if="scrol">
+      <mt-button type="primary" @click="goto('/mine')">我的订单</mt-button>
+    </div>
+    <div class="foot-btn-scrol" v-if="!scrol">
       <mt-button type="primary" @click="goto('/mine')">我的订单</mt-button>
     </div>
   </div>
@@ -34,7 +37,16 @@
 <script>
   export default {
     data: function () {
-      return {};
+      return {
+        scrol:false
+      };
+    },
+    mounted(){
+      console.log(document.body.scrollHeight)
+      console.log(window.innerHeight)
+      if (document.body.scrollHeight > (window.innerHeight || document.documentElement.clientHeight)){
+        this.scrol = true
+      }
     },
     methods: {
       // Record(){
@@ -109,10 +121,28 @@
     width: 100%;
     height: 100%;
   }
+  .foot-btn-scrol{
+    position: absolute;
+    width: 100%;
+    bottom: 0
+  }
+
+  .foot-btn-scrol button {
+    width: 100%
+  }
 
   .row {
     background-color: #fff;
     float: left;
+    width: 100%;
+  }
+  .row p:first-child {
+    color: #808080;
+    padding-left: 1rem;
+    
+  }
+  .col-6 p{
+    margin-top: 0.5rem
   }
 
   .row p:first-child {
@@ -121,6 +151,7 @@
   }
   .row .box{
     float: left;
+    width: 100%;
     border: 0.2px solid #E0E0E0;
   }
 
@@ -134,7 +165,7 @@
   }
 
   .col-6 img {
-    width: 50%;
+    width: 40%;
   }
   .col-6:first-child{
     border-right: 0.2px solid #E0E0E0;
