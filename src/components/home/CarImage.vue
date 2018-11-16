@@ -8,7 +8,7 @@
         <input id="image" type="file" name="file" accept="image/*" v-on:change="SetMayImg0($event)" class="fileimg">
       </div>
       <p class="title">输入查询车辆相关信息</p>
-      <mt-field disableClear label="VIN码" placeholder="请输入VIN码" v-model="vin"></mt-field>
+      <mt-field disableClear label="VIN码" @mouseleave.native="getInfo()" placeholder="请输入VIN码" v-model="vin"></mt-field>
       <mt-cell title="车型" :value="list.modelid" is-link @click.native="handlerArea1"></mt-cell>
       <mt-cell title="省市" :value="list.zone" is-link @click.native="handlerArea"></mt-cell>
       <mt-cell title="上牌日期" :value="list.regDate" is-link @click.native="open()"></mt-cell>
@@ -94,12 +94,15 @@
         city: '',
         choose: false,
         areaVisible: false,
+        
         brand: [],
         areaVisible1: false,
         brandid: '', //品牌ID
         series: '', //车型ID
         chooseseries: '', //当前选择的车系
-        modleid: '', //车系ID
+        modleid: {
+          Model_ID:''
+        }, //车系ID
         time: [], //上牌时间年份
         choosemouth: '', //当前选择的月份
         mouth: [], //上牌时间月份
@@ -123,9 +126,9 @@
       // this.getInfo()
     },
     watch: {
-      vin: function (n, o) {
-        this.getInfo()
-      },
+      // vin: function (n, o) {
+      //   this.getInfo()
+      // },
     },
     methods: {
       //上传价目表 
@@ -168,7 +171,7 @@
                 // var blob = _this.dataURItoBlob(base64);
                 // formdata.append('file', blob, 'image.png');
                 _this.imgurl = base64
-                console.log(base64)
+                // console.log(base64)
                 _this.driveData = base64.split("base64,")[1]
                 _this.next()
                 // $.ajax({
@@ -270,6 +273,7 @@
                 this.list.car_no = response.data.data.plate_num
                 this.list.engine_no = response.data.data.engine_num
                 this.vin = response.data.data.vin
+                this.getInfo()
               } else {
                 Toast(response.data.error_msg)
               }
@@ -299,7 +303,10 @@
               Indicator.close();
               var status = response.data.Status;
               if (status === 1) {
-                this.list.modelid = response.data.Result.model_id
+                this.list.modelid = response.data.Result.series_name
+                this.modleid.Model_ID = response.data.Result.model_id
+                this.maxtime = response.data.Result.max_reg_year
+                this.mintime = response.data.Result.min_reg_year
               } else if (status === 40001) {
                 Toast(response.data.Result)
                 setTimeout(() => {
@@ -316,6 +323,7 @@
           .catch(
             function (error) {
               Indicator.close();
+              console.log(error)
               Toast('服务器开小差啦，请稍后再试')
             }.bind(this)
           );
@@ -418,8 +426,12 @@
         }
       },
       onAddressChange7(values) {
-        this.list.regDate = this.choosemouth + '年' + values + '月'
-        this.areaVisible4 = false
+        if (values>=9) {
+          this.list.regDate = this.choosemouth + '-' + values 
+        }else{
+          this.list.regDate = this.choosemouth + '-0' + values
+        }
+        this.areaVisible6 = false
         this.choose = false
       },
       confirm1() {
@@ -471,6 +483,7 @@
                   this.disable = true
                   Toast('抱歉，没能获取到该车型，请上传行驶证进行车辆估值')
                 } else {
+                  this.disable = false
                   this.addressSlots3 = response.data.Result
                   this.areaVisible2 = false
                   this.areaVisible3 = true
@@ -547,7 +560,7 @@
             params: {
               modelid: this.modleid.Model_ID,
               regDate: this.list.regDate,
-              zone: this.city,
+              zone: this.list.zone.split(' ')[1],
               mile: this.list.mile
               // Token: getCookie("token"),
             }
