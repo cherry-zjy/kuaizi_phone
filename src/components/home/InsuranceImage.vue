@@ -294,17 +294,17 @@ import {
   }
 
   .imgbox img {
-    width: 96%;
-    margin-left: 2%;
+    width: 90%;
+    margin-left: 5%;
     height: 10rem;
   }
 
   .fileimg {
     position: absolute;
-    width: 96%;
+    width: 90%;
     height: 10rem;
     top: 0;
-    left: 2%;
+    left: 5%;
     opacity: 0;
   }
 
@@ -318,7 +318,7 @@ import {
     width: 100%
   }
   .title{
-    margin-left: 2%;
+    margin-left: 5%;
     color: #808080
   }
 

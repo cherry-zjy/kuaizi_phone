@@ -4,7 +4,7 @@
       <mt-swipe-item><img src="../../assets/banner.png"></mt-swipe-item>
       <mt-swipe-item><img src="../../assets/banner_1.png"></mt-swipe-item>
     </mt-swipe>
-    <mt-field placeholder="请输入18位VIN码" class="vin" v-model="vin">
+    <mt-field placeholder="请输入18位VIN码" class="vin" v-model="vin" @mouseleave.native='getInfo'>
       <img src="../../assets/photo.png" class="phonticon">
       <input id="image" type="file" name="file" accept="image/*" v-on:change="SetMayImg0($event)" class="fileimg">
     </mt-field>
@@ -30,6 +30,10 @@
     <mt-cell title="最小上牌年份" :value="list.min_reg_year"></mt-cell>
     <mt-cell title="最大上牌年份" :value="list.max_reg_year"></mt-cell>
     <!-- <mt-cell title="映射车型ID" :value="list.brand_name"></mt-cell> -->
+    <div class="foot-btn">
+      <mt-button type="primary" @click="query()">车辆估值</mt-button>
+      <mt-button type="primary" @click="query1()">维保查询</mt-button>
+    </div>
   </div>
 </template>
 
@@ -45,7 +49,8 @@
     data: function () {
       return {
         list: {},
-        vin: ''
+        vin: '',
+        engine_no:''
       };
     },
     watch: {
@@ -192,6 +197,8 @@
               if (status === 1) {
                 this.list.car_no = response.data.data.plate_num
                 this.list.engine_no = response.data.data.engine_num
+                this.engine_no = response.data.data.engine_num
+                console.log(this.list.engine_no)
                 this.vin = response.data.data.vin
               } else {
                 Toast(response.data.error_msg)
@@ -206,6 +213,20 @@
               Toast('服务器开小差啦，请稍后再试')
             }.bind(this)
           );
+      },
+      query() {
+        if (this.vin == '') {
+          Toast('请输入vin码')
+          return;
+        }
+        this.$router.push("/CarImage?vin=" + this.vin);
+      },
+      query1() {
+        if (this.vin == '') {
+          Toast('请输入vin码')
+          return;
+        }
+        this.$router.push("/MaintenanceImage?vin=" + this.vin + "&engine=" + this.engine_no);
       },
       getInfo() {
         Indicator.open();
@@ -301,8 +322,7 @@
   }
 
   .foot-btn {
-    position: fixed;
-    bottom: 1rem;
+    margin-top: 10px;
     width: 100%
   }
 
@@ -316,8 +336,8 @@
   }
 
   .imgbox img {
-    width: 96%;
-    margin-left: 2%;
+    width: 98%;
+    margin-left: 1%;
     height: 10rem;
   }
 
@@ -329,7 +349,7 @@
   }
 
   .title {
-    margin-left: 2%;
+    margin-left: 5%;
     color: #808080
   }
 

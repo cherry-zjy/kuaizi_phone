@@ -34,7 +34,13 @@
         },
       };
     },
-    mounted() {},
+    mounted() {
+      if(window.location.href.split("?vin=")[1]){
+        this.list.vin = window.location.href.split("?vin=")[1].split("&engine=")[0]
+        this.list.engine_no = window.location.href.split("?vin=")[1].split("&engine=")[1]
+        // this.getInfo()
+      }
+    },
     methods: {
       SetMayImg0(e) {
         var tag = e.target;
@@ -278,7 +284,7 @@
   }
 
   .title {
-    margin-left: 2%;
+    margin-left: 5%;
     color: #808080
   }
 

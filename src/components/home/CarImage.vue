@@ -123,6 +123,10 @@
     mounted() {
       this.address = expresss
       console.log(expresss)
+      if(window.location.href.split("?vin=")[1]){
+        this.vin = window.location.href.split("?vin=")[1]
+        this.getInfo()
+      }
       // this.getInfo()
     },
     watch: {
@@ -629,17 +633,17 @@
   }
 
   .imgbox img {
-    width: 96%;
-    margin-left: 2%;
+    width: 90%;
+    margin-left: 5%;
     height: 10rem;
   }
 
   .fileimg {
     position: absolute;
-    width: 96%;
+    width: 90%;
     height: 10rem;
     top: 0;
-    left: 2%;
+    left: 5%;
     opacity: 0;
   }
 
@@ -654,8 +658,8 @@
   }
 
   .title {
-    margin-left: 2%;
-    color: #808080
+    margin-left: 5%;
+    color: #808080;
   }
 
 </style>
