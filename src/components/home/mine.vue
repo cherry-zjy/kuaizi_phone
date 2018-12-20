@@ -48,7 +48,8 @@
         list: [],
         icon: '',
         UserName: '',
-        mainurl: ''
+        mainurl: '',
+        time: ''
       }
     },
     mounted() {
@@ -62,10 +63,14 @@
       this.flash()
       // this.getUserInfo()
     },
+    beforeDestroy(){
+      console.log(this.time)
+      clearInterval(this.time)
+    },
     methods: {
       flash() {
         var that = this
-        setInterval(function () {
+        that.time = setInterval(function () {
           that.getInfo()
         }, 5000)
       },

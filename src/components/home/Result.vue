@@ -1,6 +1,6 @@
 <template>
   <div class="page-cell">
-    <mt-swipe :auto="4000">
+    <mt-swipe :auto="4000" id="banner">
       <mt-swipe-item><img src="../../assets/banner.png"></mt-swipe-item>
       <mt-swipe-item><img src="../../assets/banner_1.png"></mt-swipe-item>
     </mt-swipe>
@@ -65,6 +65,15 @@
         this.$router.push("/Login");
         return;
       }
+      const that = this;
+      that.clientWight = `${window.innerWidth}`;
+      console.log(that.clientWight * 0.4)
+      document.getElementById('banner').setAttribute('style', 'height: ' + that.clientWight * 0.43 + 'px');
+      window.onresize = function temp() {
+        that.clientWight = `${window.innerWidth}`;
+        console.log(that.clientWight * 0.4)
+        document.getElementById('banner').setAttribute('style', 'height: ' + that.clientWight * 0.43 + 'px');
+      };
       // this.getInfo()
     },
     methods: {

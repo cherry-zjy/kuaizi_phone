@@ -1,6 +1,6 @@
 <template>
   <div class="hello" style="float:left">
-    <mt-swipe :auto="4000">
+    <mt-swipe :auto="4000" id="banner">
       <mt-swipe-item><img src="../../assets/banner.png"></mt-swipe-item>
       <mt-swipe-item><img src="../../assets/banner_1.png"></mt-swipe-item>
     </mt-swipe>
@@ -47,6 +47,15 @@
       if (document.body.scrollHeight > (window.innerHeight || document.documentElement.clientHeight)){
         this.scrol = true
       }
+      const that = this;
+      that.clientWight = `${window.innerWidth}`;
+      console.log(that.clientWight * 0.4)
+      document.getElementById('banner').setAttribute('style', 'height: ' + that.clientWight * 0.43 + 'px');
+      window.onresize = function temp() {
+        that.clientWight = `${window.innerWidth}`;
+        console.log(that.clientWight * 0.4)
+        document.getElementById('banner').setAttribute('style', 'height: ' + that.clientWight * 0.43 + 'px');
+      };
     },
     methods: {
       // Record(){
@@ -132,14 +141,8 @@
   }
 
   .row {
-    background-color: #fff;
     float: left;
     width: 100%;
-  }
-  .row p:first-child {
-    color: #808080;
-    padding-left: 1rem;
-    
   }
   .col-6 p{
     margin-top: 0.5rem
@@ -147,12 +150,14 @@
 
   .row p:first-child {
     color: #808080;
-    padding-left: 1rem;
+    padding-left: 5%;
   }
   .row .box{
     float: left;
-    width: 100%;
+    width: 90%;
     border: 0.2px solid #E0E0E0;
+    margin-left: 5%;
+    background-color: #fff;
   }
 
   .col-6 {
