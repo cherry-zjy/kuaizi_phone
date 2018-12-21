@@ -2,10 +2,13 @@
   <div class="root">
     <p class="title">月卡查询套餐</p>
     <div class="list">
-      <div v-for="(l,i) in 6" :key="i" :class="choiceNum == i?'active':''" @click="choiceClick(i)">
-        <p class="list-price">￥{{(i+1)*0.01}}</p>
-        <p class="list-mouth">{{i+1}}个月</p>
+      <div v-for="(l,i) in price" :key="i" :class="choiceNum == i?'active':''" @click="choiceClick(i,l.price,l.time)">
+        <p class="list-yuanjia">￥{{l.yuanjia}}</p>
+        <p class="list-price">￥{{l.price}}</p>
+        <p class="list-mouth">{{l.time}}个月</p>
       </div>
+      <div class="itemempty"></div>
+      <div class="itemempty"></div>
     </div>
     <!-- <div class="footer"> -->
     <!-- <div class="tip">小计：￥11231</div> -->
@@ -14,7 +17,7 @@
   </div>
 </template>
 <script>
-import {
+  import {
     Toast
   } from 'mint-ui';
   import {
@@ -24,13 +27,34 @@ import {
     data() {
       return {
         choiceNum: 0,
-        url: ''
+        url: '',
+        buyprice:'29',
+        time:'1',
+        price:[{
+          yuanjia:'58',
+          price:'29',
+          time:'1'
+        },{
+          yuanjia:'158',
+          price:'79',
+          time:'3'
+        },{
+          yuanjia:'238',
+          price:'119',
+          time:'6'
+        },{
+          yuanjia:'398',
+          price:'199',
+          time:'12'
+        }]
       }
     },
     components: {},
     methods: {
-      choiceClick(i) {
-        this.choiceNum = i
+      choiceClick(i,price,time) {
+        this.choiceNum = i;
+        this.buyprice = price
+        this.time = time
       },
       getUrlParam(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); // 构造一个含有目标参数的正则表达式对象
@@ -41,14 +65,15 @@ import {
           return null;
         }
       },
-      Record(){
+      Record() {
         Indicator.open();
         this.$http
           .get("api/User/JiulingOrder", {
             params: {
               appid: getCookie("openid"),
               Token: getCookie("token"),
-              price:this.choiceNum*0.01
+              Status:this.time,
+              price: this.buyprice
             }
           })
           .then(
@@ -56,7 +81,8 @@ import {
               Indicator.close();
               var status = response.data.Status;
               if (status === 1) {
-                Toast(response.data.Result)
+                // Toast(response.data.Result)
+                callpay(response.data.Result);
               } else if (status === 40001) {
                 Toast(response.data.Result)
                 setTimeout(() => {
@@ -82,12 +108,10 @@ import {
     mounted() {
       this.url = window.location.href;
       if (this.url.indexOf("openid") > 0) {
-        var openid = this.getUrlParam("openid");
+        var openid = this.url.split('openid=')[1];
         setCookie("openid", openid);
-        // this.getBusnessDetail();
       } else {
         if (getCookie("openid")) {
-          // this.getBusnessDetail();
         } else {
           window.location.href =
             "http://api.kuaizijinrong.com/oauth/weixin"
@@ -133,6 +157,10 @@ import {
     font-weight: 600;
   }
 
+  .list-yuanjia{
+    text-decoration:line-through
+  }
+
   .list-mouth {
     color: #999999
   }
@@ -141,6 +169,11 @@ import {
     position: fixed;
     bottom: 0rem;
     width: 100%;
+  }
+  .list .itemempty{
+    height: 0px;
+    width: 30%;
+    border: none;
   }
 
 </style>
