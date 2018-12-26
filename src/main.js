@@ -11,8 +11,8 @@ import qs from 'qs'
 Vue.prototype.$http = axios;
 
 // axios.defaults.headers.post['Content-Type'] = 'application/json';
-axios.defaults.baseURL = 'http://api.kuaizijinrong.com';
-// axios.defaults.baseURL = 'http://192.168.1.125/KuaiZi/';
+// axios.defaults.baseURL = 'http://api.kuaizijinrong.com';
+axios.defaults.baseURL = 'http://192.168.1.125/KuaiZi/';
 
 Vue.use(Mint)
 

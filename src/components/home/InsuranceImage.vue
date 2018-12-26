@@ -11,7 +11,7 @@
     <mt-field disableClear label="发动机号" placeholder="请输入发动机号" v-model="list.engine_no"></mt-field>
     <mt-field disableClear label="身份证号" type="mile" placeholder="请输入身份证号" v-model="list.id_no"></mt-field>
     <mt-field disableClear label="车牌号" type="mile" placeholder="请输入车牌号" v-model="list.car_no"></mt-field>
-    <div class="foot-btn">
+    <div class="foot-btn" v-if="show">
       <mt-button type="primary" @click="query()">确认</mt-button>
       <!-- <mt-button type="primary" size="small" @click="query()">单次查询</mt-button> -->
       <!-- <mt-button type="primary" size="small" @click="query()">月卡查询</mt-button> -->
@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import {
+  import {
     Toast
   } from 'mint-ui';
   import {
@@ -33,13 +33,24 @@ import {
         list: {
           engine_no: "",
           id_no: '',
-          car_no:'',
-          vin:''
+          car_no: '',
+          vin: ''
         },
+        show: true,
+        imgurl: ''
       };
     },
     mounted() {
-      // this.getInfo()
+      var h = window.innerHeight;
+      var that = this
+      window.onresize = function temp() {
+        if (window.innerHeight < h) {
+          that.show = false;
+        }
+        if (window.innerHeight >= h) {
+          that.show = true;
+        }
+      };
     },
     methods: {
       SetMayImg0(e) {
@@ -78,35 +89,62 @@ import {
               } else {
                 //ajax请求，通过formdata进行上传图片 
                 var formdata = new FormData();
-                // var blob = _this.dataURItoBlob(base64);
-                // formdata.append('file', blob, 'image.png');
+                var blob = _this.dataURItoBlob(base64);
+                formdata.append('file', blob, 'image.png')
                 _this.imgurl = base64
-                console.log(base64)
+                // console.log(base64)
                 _this.driveData = base64.split("base64,")[1]
-                _this.next()
-                // $.ajax({
-                //   type: 'post',
-                //   url: urlf + "/api/Photo/UpdateForImage?type=0",
-                //   data: formdata,
-                //   cache: false,
-                //   processData: false, // 不处理发送的数据，因为data值是Formdata对象，不需要对数据做处理
-                //   contentType: false, // 不设置Content-type请求头
-                //   success: function (data) {
-                //     if (data.Status == 1) {
-                //       $(".MeImg0").attr("src", base64)
-                //       _this.PirceImage = data.Result[0]
-                //       _this.numPriceImg = 1
-                //       bus.$emit("PirceImage", _this.PirceImage)
-                //     } else {
-                //       alert(data.Result)
-                //     }
-                //   }.bind(_this)
-                // })
+                _this.uploadimg(formdata)
               }
             };
           };
           oReader.readAsDataURL(fileList[0]);
         }
+      },
+      uploadimg(formdata) {
+        Indicator.open();
+        this.$http
+          .post("api/Back/UpdateForImage?type=0",
+            formdata
+          )
+          .then(
+            function (response) {
+              Indicator.close();
+              var status = response.data.Status;
+              if (status === 1) {
+
+              } else {
+                Toast(response.data.error_msg)
+              }
+            }.bind(this)
+          )
+          // 请求error
+          .catch(
+            function (error) {
+              console.log(error)
+              Indicator.close();
+              Toast('服务器开小差啦，请稍后再试')
+            }.bind(this)
+          );
+      },
+      // 创建一个Blob对象 用于将base64转化为formdata
+      dataURItoBlob(base64Data) {
+        var byteString
+        if (base64Data.split(',')[0].indexOf('base64') >= 0) {
+          byteString = window.atob(base64Data.split(',')[1])
+        } else {
+          byteString = unescape(base64Data.split(',')[1])
+        }
+        var mimeString = base64Data.split(',')[0].split(':')[1].split(';')[0] // type
+        // 处理异常,将ascii码小于0的转换为大于0
+        var ab = new ArrayBuffer(byteString.length) // size
+        var ia = new Uint8Array(ab)
+        for (var i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i)
+        }
+        return new Blob([ab], {
+          type: mimeString
+        })
       },
       //缩放图片，防止图片宽高过大 
       imgScale0(imgUrl, quality) {
@@ -142,35 +180,35 @@ import {
         }
       },
       addimg(e) { //添加图片
-      var tt = this;
+        var tt = this;
         var reader = new FileReader();
         var AllowImgFileSize = 2100000; //上传图片最大值(单位字节)（ 2 M = 2097152 B ）超过2M上传失败
         var file = $("#image")[0].files[0];
         var imgUrlBase64;
         if (file) {
-            //将文件以Data URL形式读入页面  
-            imgUrlBase64 = reader.readAsDataURL(file);
-            reader.onload = function (e) {
-              //var ImgFileSize = reader.result.substring(reader.result.indexOf(",") + 1).length;//截取base64码部分（可选可不选，需要与后台沟通）
-              // if (AllowImgFileSize != 0 && AllowImgFileSize < reader.result.length) {
-              //       alert( '上传失败，请上传不大于2M的图片！');
-              //       return;
-                // }else{
-                  // document.getElementById('image').src=this.result;
-                    //执行上传操作
-                    $(".upload").attr('src',this.result)
-                    tt.driveData = reader.result.split("base64,")[1]
-                    tt.next()
-                // }
-            }
-         } 
+          //将文件以Data URL形式读入页面  
+          imgUrlBase64 = reader.readAsDataURL(file);
+          reader.onload = function (e) {
+            //var ImgFileSize = reader.result.substring(reader.result.indexOf(",") + 1).length;//截取base64码部分（可选可不选，需要与后台沟通）
+            // if (AllowImgFileSize != 0 && AllowImgFileSize < reader.result.length) {
+            //       alert( '上传失败，请上传不大于2M的图片！');
+            //       return;
+            // }else{
+            // document.getElementById('image').src=this.result;
+            //执行上传操作
+            $(".upload").attr('src', this.result)
+            tt.driveData = reader.result.split("base64,")[1]
+            tt.next()
+            // }
+          }
+        }
       },
-      next(){
+      next() {
         Indicator.open();
         this.$http
-          .post("http://testapi.che300.com/service/common/eval",
+          .post("api/Back/GetVin",
             qs.stringify({
-              token: 'd68de345203ea3fbded45a637fbab3bd',
+              token: 'c37aa1fa0fd86bd3164347bd246e5a58',
               oper: 'identifyDriverCard',
               driveData: this.driveData
             })
@@ -178,12 +216,12 @@ import {
           .then(
             function (response) {
               Indicator.close();
-              var status = response.data.status;
+              var status = response.data.Status;
               if (status === 1) {
                 this.list.car_no = response.data.data.plate_num
                 this.list.engine_no = response.data.data.engine_num
                 this.list.vin = response.data.data.vin
-              }else {
+              } else {
                 Toast(response.data.error_msg)
               }
             }.bind(this)
@@ -222,21 +260,21 @@ import {
               var status = response.data.Status;
               if (status === 1) {
                 window.location.href = response.data.Result
-              }else if(status === 40001){
+              } else if (status === 40001) {
                 Toast(response.data.Result)
                 setTimeout(() => {
                   this.$router.push({
                     path: "/Login"
                   });
                 }, 1500);
-              } else if(status === 2){
+              } else if (status === 2) {
                 Toast(response.data.Result)
                 setTimeout(() => {
                   this.$router.push({
                     path: "/mine"
                   });
                 }, 1500);
-              }else {
+              } else {
                 Indicator.close();
                 Toast(response.data.Result)
               }
@@ -317,7 +355,8 @@ import {
   .foot-btn button {
     width: 100%
   }
-  .title{
+
+  .title {
     margin-left: 5%;
     color: #808080
   }

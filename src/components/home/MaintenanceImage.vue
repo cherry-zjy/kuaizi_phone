@@ -9,7 +9,7 @@
     <p class="title">输入查询车辆相关信息</p>
     <mt-field disableClear label="发动机号" placeholder="请输入发动机号" v-model="list.engine_no"></mt-field>
     <mt-field disableClear label="VIN码" placeholder="请输入VIN码" v-model="list.vin"></mt-field>
-    <div class="foot-btn">
+    <div class="foot-btn" v-if="show">
       <mt-button type="primary" @click="query()">确认</mt-button>
       <!-- <mt-button type="primary" size="small" @click="query()">单次查询</mt-button> -->
       <!-- <mt-button type="primary" size="small" @click="query()">月卡查询</mt-button> -->
@@ -32,6 +32,7 @@
           engine_no: '',
           vin: ''
         },
+        show:true
       };
     },
     mounted() {
@@ -40,6 +41,16 @@
         this.list.engine_no = window.location.href.split("?vin=")[1].split("&engine=")[1]
         // this.getInfo()
       }
+      var h = window.innerHeight;
+      var that = this
+      window.onresize = function temp() {
+        if (window.innerHeight < h) {
+          that.show = false;
+        }
+        if (window.innerHeight >= h) {
+          that.show = true;
+        }
+      };
     },
     methods: {
       SetMayImg0(e) {
@@ -157,9 +168,9 @@
       next() {
         Indicator.open();
         this.$http
-          .post("http://testapi.che300.com/service/common/eval",
+          .post("api/Back/GetVin",
             qs.stringify({
-              token: 'd68de345203ea3fbded45a637fbab3bd',
+              token: 'c37aa1fa0fd86bd3164347bd246e5a58',
               oper: 'identifyDriverCard',
               driveData: this.driveData
             })
@@ -167,7 +178,7 @@
           .then(
             function (response) {
               Indicator.close();
-              var status = response.data.status;
+              var status = response.data.Status;
               if (status === 1) {
                 this.list.car_no = response.data.data.plate_num
                 this.list.engine_no = response.data.data.engine_num

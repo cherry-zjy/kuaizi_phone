@@ -13,7 +13,7 @@
       <mt-cell title="省市" :value="list.zone" is-link @click.native="handlerArea"></mt-cell>
       <mt-cell title="上牌日期" :value="list.regDate" is-link @click.native="open()"></mt-cell>
       <mt-field disableClear label="行驶里程（万公里）" type="number" placeholder="行驶里程" v-model="list.mile"></mt-field>
-      <div class="foot-btn">
+      <div class="foot-btn" v-if="show">
         <mt-button type="primary" @click="query()">确认</mt-button>
       </div>
     </div>
@@ -94,14 +94,14 @@
         city: '',
         choose: false,
         areaVisible: false,
-        
+
         brand: [],
         areaVisible1: false,
         brandid: '', //品牌ID
         series: '', //车型ID
         chooseseries: '', //当前选择的车系
         modleid: {
-          Model_ID:''
+          Model_ID: ''
         }, //车系ID
         time: [], //上牌时间年份
         choosemouth: '', //当前选择的月份
@@ -117,16 +117,27 @@
         addressSlots2: [],
         addressSlots3: [],
         value2: null,
-        disable: false //车系是否获得
+        disable: false ,//车系是否获得
+        show:true
       };
     },
     mounted() {
       this.address = expresss
       console.log(expresss)
-      if(window.location.href.split("?vin=")[1]){
+      if (window.location.href.split("?vin=")[1]) {
         this.vin = window.location.href.split("?vin=")[1]
         this.getInfo()
       }
+      var h = window.innerHeight;
+      var that = this
+      window.onresize = function temp() {
+        if (window.innerHeight < h) {
+          that.show = false;
+        }
+        if (window.innerHeight >= h) {
+          that.show = true;
+        }
+      };
       // this.getInfo()
     },
     watch: {
@@ -262,9 +273,9 @@
       next() {
         Indicator.open();
         this.$http
-          .post("http://testapi.che300.com/service/common/eval",
+          .post("api/Back/GetVin",
             qs.stringify({
-              token: 'd68de345203ea3fbded45a637fbab3bd',
+              token: 'c37aa1fa0fd86bd3164347bd246e5a58',
               oper: 'identifyDriverCard',
               driveData: this.driveData
             })
@@ -272,7 +283,7 @@
           .then(
             function (response) {
               Indicator.close();
-              var status = response.data.status;
+              var status = response.data.Status;
               if (status === 1) {
                 this.list.car_no = response.data.data.plate_num
                 this.list.engine_no = response.data.data.engine_num
@@ -430,9 +441,9 @@
         }
       },
       onAddressChange7(values) {
-        if (values>=9) {
-          this.list.regDate = this.choosemouth + '-' + values 
-        }else{
+        if (values >= 9) {
+          this.list.regDate = this.choosemouth + '-' + values
+        } else {
           this.list.regDate = this.choosemouth + '-0' + values
         }
         this.areaVisible6 = false
@@ -565,8 +576,8 @@
               modelid: this.modleid.Model_ID,
               regDate: this.list.regDate,
               zone: this.list.zone.split(' ')[1],
-              mile: this.list.mile
-              // Token: getCookie("token"),
+              mile: this.list.mile,
+              Token: getCookie("token"),
             }
           })
           .then(

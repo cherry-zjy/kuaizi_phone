@@ -192,9 +192,9 @@
       next() {
         Indicator.open();
         this.$http
-          .post("http://testapi.che300.com/service/common/eval",
+          .post("api/Back/GetVin",
             qs.stringify({
-              token: 'd68de345203ea3fbded45a637fbab3bd',
+              token: 'c37aa1fa0fd86bd3164347bd246e5a58',
               oper: 'identifyDriverCard',
               driveData: this.driveData
             })
@@ -202,7 +202,7 @@
           .then(
             function (response) {
               Indicator.close();
-              var status = response.data.status;
+              var status = response.data.Status;
               if (status === 1) {
                 this.list.car_no = response.data.data.plate_num
                 this.list.engine_no = response.data.data.engine_num
